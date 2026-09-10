@@ -1,16 +1,5 @@
 [
  {
-  "slug": "beef-stroganoff",
-  "name": "Beef Stroganoff",
-  "site": "recipetineats.com",
-  "source": "https://www.recipetineats.com/beef-stroganoff/",
-  "image": "https://www.recipetineats.com/tachyon/2018/01/Beef-Stroganoff_2-1-1.jpg",
-  "prepTime": "15 min",
-  "cookTime": "15 min",
-  "totalTime": "30 min",
-  "savedAt": "2026-09-10T00:42:27Z"
- },
- {
   "slug": "one-pot-creamy-cajun-chicken-pasta",
   "name": "One Pot Creamy Cajun Chicken Pasta",
   "site": "budgetbytes.com",
