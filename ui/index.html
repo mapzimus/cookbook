@@ -69,6 +69,10 @@
   .hint.err, .err { color: var(--danger); }
 
   /* ---- list ---- */
+  .searchbar { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin: 0 0 14px; }
+  .searchbar input { flex: 1 1 240px; min-width: 0; padding: 10px 12px; border: 1px solid var(--border); background: var(--surface); color: var(--text); border-radius: 9px; font-size: 1rem; font-family: var(--sans); }
+  .searchbar input:focus { outline: 2px solid var(--accent); outline-offset: 1px; border-color: var(--accent); }
+  .searchbar .count { margin: 0; color: var(--muted); font-size: .82rem; white-space: nowrap; }
   .cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 16px; }
   .card { display: flex; flex-direction: column; text-decoration: none; color: inherit; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden; transition: transform .12s ease, box-shadow .12s ease, border-color .12s ease; }
   .card:hover { transform: translateY(-3px); box-shadow: var(--shadow-lg); border-color: var(--accent); }
@@ -993,6 +997,7 @@
   });
 
   // ---------- list ----------
+  var listQuery = "";   // what's typed in the search box; kept while you open and close recipes
   function showList() {
     document.title = "Cookbook";
     loadIndex().then(function (items) {
@@ -1000,16 +1005,34 @@
         status(unlocked() ? "No recipes yet. Paste a link above, or write your own." : "No recipes yet.");
         return;
       }
-      var grid = el("div", { class: "cards" });
-      items.forEach(function (r) {
+      function card(r) {
         var thumb = el("div", { class: "thumb" }, [image(r.image, "", "") || "🍽️"]);
         var t = r.totalTime || (minutes(r.prepTime) != null && minutes(r.cookTime) != null ? fmtMin(minutes(r.prepTime) + minutes(r.cookTime)) : null);
         var meta = [r.site || "your own", t].filter(Boolean).join(" · ");
-        grid.appendChild(el("a", { class: "card", href: "#" + encodeURIComponent(r.slug) }, [
+        return el("a", { class: "card", href: "#" + encodeURIComponent(r.slug) }, [
           thumb, el("div", { class: "body" }, [el("h3", { text: r.name || r.slug }), el("p", { class: "meta", text: meta })])
-        ]));
-      });
-      view.replaceChildren(grid);
+        ]);
+      }
+      // Every word typed has to appear somewhere in the name or site, in any order.
+      function matches(r, words) {
+        var hay = [r.name, r.site, r.slug].map(str).join(" ").toLowerCase();
+        return words.every(function (w) { return hay.indexOf(w) >= 0; });
+      }
+      var search = el("input", { class: "search", type: "search", placeholder: "Search recipes…", "aria-label": "Search recipes", autocomplete: "off", spellcheck: "false" });
+      search.value = listQuery;
+      var count = el("p", { class: "count" });
+      var grid = el("div", { class: "cards" });
+      function draw() {
+        var q = listQuery.trim().toLowerCase(), words = q ? q.split(/\s+/) : [];
+        var shown = items.filter(function (r) { return matches(r, words); });
+        grid.replaceChildren.apply(grid, shown.map(card));
+        count.textContent = !q ? items.length + " recipe" + (items.length === 1 ? "" : "s")
+          : shown.length ? shown.length + " of " + items.length
+          : "Nothing matches “" + listQuery.trim() + "”";
+      }
+      search.addEventListener("input", function () { listQuery = search.value; draw(); });
+      draw();
+      view.replaceChildren(el("div", { class: "searchbar" }, [search, count]), grid);
     }).catch(function (e) { status(loadError(e), true); });
   }
 
@@ -1184,9 +1207,10 @@
   // #week=<mon>,<tue>,… where a day is its meals joined by "+", a bare slug is
   // dinner and "b:"/"l:"/"s:" prefix breakfast, lunch and dessert.
   var DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
-  var KINDS = { dinner: "Dinner", breakfast: "Breakfast", lunch: "Lunch", dessert: "Dessert" };
-  var EXTRA_KINDS = ["breakfast", "lunch", "dessert"];
-  var KIND_CODE = { breakfast: "b", lunch: "l", dessert: "s" }, CODE_KIND = { b: "breakfast", l: "lunch", s: "dessert" };
+  // "Other" is for a dish that isn't a meal here: a potluck, a party, something to bring.
+  var KINDS = { dinner: "Dinner", breakfast: "Breakfast", lunch: "Lunch", dessert: "Dessert", other: "Other" };
+  var EXTRA_KINDS = ["breakfast", "lunch", "dessert", "other"];
+  var KIND_CODE = { breakfast: "b", lunch: "l", dessert: "s", other: "o" }, CODE_KIND = { b: "breakfast", l: "lunch", s: "dessert", o: "other" };
   // Empty slots are "" (not null) so JSON and UI never show the word "null".
   function validSlug(s) {
     if (typeof s !== "string") return "";
@@ -1331,7 +1355,7 @@
             cancel.addEventListener("click", function () { adding[i] = false; render(); });
             addRow.appendChild(cancel);
           } else {
-            var plus = el("button", { class: "plus", type: "button", title: "Add breakfast, lunch or dessert to this day", text: "+ Add meal" });
+            var plus = el("button", { class: "plus", type: "button", title: "Add breakfast, lunch, dessert, or a dish you're bringing somewhere", text: "+ Add meal" });
             plus.addEventListener("click", function () { adding[i] = true; render(); });
             addRow.appendChild(plus);
           }
@@ -1391,27 +1415,48 @@
           return el("li", {}, kids);
         }
 
-        Promise.all(allSlugs().filter(unique).map(function (s) { return loadRecipe(s).catch(function () { return null; }); })).then(function (full) {
-          var planned = allSlugs().filter(unique);
+        // Every planned meal, duplicates included: three nights of the same dinner
+        // is three lots of groceries and three lots of cooking.
+        var occurrences = allSlugs(), uniques = occurrences.filter(unique), repeatOf = {};
+        occurrences.forEach(function (s) { repeatOf[s] = (repeatOf[s] || 0) + 1; });
+        Promise.all(uniques.map(function (s) { return loadRecipe(s).catch(function () { return null; }); })).then(function (full) {
           var frag = document.createDocumentFragment();
           var prepTotal = 0, cookTotal = 0, anyEst = false, missing = 0;
-          full.forEach(function (r, idx) {
+          var bySlug = {};
+          uniques.forEach(function (s, i) { bySlug[s] = full[i]; });
+
+          // Each day's line stays one batch: what you cook that night.
+          uniques.forEach(function (slug) {
+            var r = bySlug[slug];
+            if (!r) missing++;
             var cost = r ? recipeCost(r) : { total: 0, unknown: 0 };
             var t = r ? timeInfo(r) : null;
-            if (t) { prepTotal += t.prep; cookTotal += t.cook; anyEst = anyEst || t.estimated; }
-            if (!r) missing++;
-            (slotMeta[planned[idx]] || []).forEach(function (m) {
+            (slotMeta[slug] || []).forEach(function (m) {
               m.textContent = t ? "⏱ " + (t.estimated ? "~" : "") + fmtMin(t.total) + " (prep " + fmtMin(t.prep) + ", cook " + fmtMin(t.cook) + ") · 🛒 ~" + money(cost.total) : "Couldn't load this recipe.";
             });
           });
 
-          var groups = groupIngredients(full.filter(Boolean), planned.filter(function (s, i) { return full[i]; }));
+          // The totals and the list run over occurrences.
+          var occRecipes = [], occSlugs = [];
+          occurrences.forEach(function (s) { if (bySlug[s]) { occRecipes.push(bySlug[s]); occSlugs.push(s); } });
+          occRecipes.forEach(function (r) {
+            var t = timeInfo(r);
+            prepTotal += t.prep; cookTotal += t.cook; anyEst = anyEst || t.estimated;
+          });
+
+          var groups = groupIngredients(occRecipes, occSlugs);
           var total = 0, unknown = 0;
           groups.forEach(function (g) { total += g.price; unknown += g.unknown; });
           var staples = groups.filter(function (g) { return g.staple; });
           var buy = groups.filter(function (g) { return !g.staple; });
 
-          if (!planned.length) frag.appendChild(el("p", { class: "meta", text: "Plan some meals and their ingredients show up here, merged and grouped by aisle." }));
+          function fromLine(g) {
+            return g.recipes.map(function (s) {
+              var name = (known[s] && known[s].name) || s;
+              return repeatOf[s] > 1 ? name + " ×" + repeatOf[s] : name;
+            }).join(" · ");
+          }
+          if (!uniques.length) frag.appendChild(el("p", { class: "meta", text: "Plan some meals and their ingredients show up here, merged and grouped by aisle." }));
           AISLES.forEach(function (aisle) {
             var rows = buy.filter(function (g) { return g.aisle === aisle; });
             if (!rows.length) return;
@@ -1419,7 +1464,7 @@
             frag.appendChild(el("ul", {}, rows.map(function (g) {
               return itemRow({ key: g.label, text: g.text, priceKey: g.priceKey, price: g.price, times: g.lines.length,
                 kind: g.unknown === g.lines.length ? "unknown" : g.set ? "set" : "est",
-                from: g.recipes.map(function (s) { return (known[s] && known[s].name) || s; }).join(" · ") });
+                from: fromLine(g) });
             })));
           });
           if (staples.length) {
@@ -1427,7 +1472,7 @@
             det.appendChild(el("summary", { text: staples.length + " staple" + (staples.length === 1 ? "" : "s") + " you probably already have" }));
             det.appendChild(el("ul", {}, staples.map(function (g) {
               return itemRow({ key: g.label, text: g.text, priceKey: g.priceKey, price: g.price, times: g.lines.length, kind: "pantry",
-                from: g.recipes.map(function (s) { return (known[s] && known[s].name) || s; }).join(" · ") });
+                from: fromLine(g) });
             })));
             frag.appendChild(det);
           }
