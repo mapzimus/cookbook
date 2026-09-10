@@ -1,0 +1,35 @@
+{
+ "slug": "brownies",
+ "name": "Brownies",
+ "source": "https://www.cookingclassy.com/brownie-recipe/",
+ "site": "cookingclassy.com",
+ "image": "https://www.cookingclassy.com/wp-content/uploads/2019/05/brownies-22.jpg",
+ "description": "The best Brownie recipe from scratch! They're so easy and unbelievably delicious, plus they use pantry staples so you can make them on those days when those intense chocolate cravings strike. They're soft and tender, nicely gooey and chewy and perfectly chocolatey.",
+ "yield": "12",
+ "prepTime": "10 min",
+ "cookTime": "40 min",
+ "totalTime": "50 min",
+ "ingredients": [
+  "3/4 cup (170g) unsalted butter*, (cut into 1-Tbsp pieces)",
+  "1 1/2 cups (300g) granulated sugar",
+  "1/2 tsp salt",
+  "3 large eggs",
+  "2 tsp vanilla extract",
+  "2/3 cup (98g) unbleached all-purpose flour ((scoop and level to measure))",
+  "2/3 cup (56g) unsweetened cocoa powder** ((spoon and level))",
+  "3/4 cup (128g) chocolate chips***"
+ ],
+ "instructions": [
+  {
+   "steps": [
+    "Preheat oven to 300 degrees. Spray and 8 by 8-inch baking dish with non-stick cooking spray, set aside.",
+    "Place butter in a large microwave safe bowl. Heat in microwave until just melted. Stir in sugar and salt, let cool slightly if warm.",
+    "Add in eggs and vanilla. Break yolks and stir with wooden spoon just until blended.",
+    "Add in flour, cocoa powder and chocolate chips. Fold and stir mixture with wooden spoon just until combined.",
+    "Pour into prepared baking dish. Spread into an even layer. Bake in preheated oven just until barely set, about 40 - 55 minutes (toothpick may have a hint of sticky batter, be careful not to over-bake).",
+    "Let cool completely on a wire rack before cutting into squares. Store in an airtight container at room temperature."
+   ]
+  }
+ ],
+ "savedAt": "2026-09-10T23:46:10Z"
+}

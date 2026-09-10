@@ -1,5 +1,16 @@
 [
  {
+  "slug": "brownies",
+  "name": "Brownies",
+  "site": "cookingclassy.com",
+  "source": "https://www.cookingclassy.com/brownie-recipe/",
+  "image": "https://www.cookingclassy.com/wp-content/uploads/2019/05/brownies-22.jpg",
+  "prepTime": "10 min",
+  "cookTime": "40 min",
+  "totalTime": "50 min",
+  "savedAt": "2026-09-10T23:46:10Z"
+ },
+ {
   "slug": "cookies-n-cream-cheesecake",
   "name": "Cookies ‘N Cream Cheesecake",
   "site": "cookingclassy.com",
