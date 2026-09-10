@@ -1,0 +1,1580 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Cookbook</title>
+<meta name="description" content="Save recipes from a link or write your own, plan the week's meals, and shop from one list with a rough grocery estimate.">
+<style>
+  :root {
+    --bg:#f6f7f9; --surface:#ffffff; --surface-2:#f0f2f5; --border:#d9dee5;
+    --text:#1c2530; --muted:#61707f; --accent:#2563eb; --accent-ink:#ffffff;
+    --danger:#c0392b; --radius:12px;
+    --shadow:0 1px 2px rgba(16,24,40,.06), 0 4px 16px rgba(16,24,40,.06);
+    --shadow-lg:0 2px 6px rgba(16,24,40,.08), 0 12px 32px rgba(16,24,40,.10);
+    --mono: ui-monospace, "SF Mono", "Cascadia Code", "Roboto Mono", Menlo, Consolas, monospace;
+    --sans: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  }
+  :root[data-theme="dark"] {
+    --bg:#0e1116; --surface:#171b22; --surface-2:#1f242d; --border:#2b323d;
+    --text:#e7ecf2; --muted:#96a2b1; --accent:#4f86ff; --accent-ink:#0e1116;
+    --danger:#ff6b5e;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.35);
+    --shadow-lg:0 2px 8px rgba(0,0,0,.5), 0 16px 40px rgba(0,0,0,.45);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg:#0e1116; --surface:#171b22; --surface-2:#1f242d; --border:#2b323d;
+      --text:#e7ecf2; --muted:#96a2b1; --accent:#4f86ff; --accent-ink:#0e1116;
+      --danger:#ff6b5e;
+      --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.35);
+      --shadow-lg:0 2px 8px rgba(0,0,0,.5), 0 16px 40px rgba(0,0,0,.45);
+    }
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; min-height: 100%; }
+  body { background: var(--bg); color: var(--text); font-family: var(--sans); line-height: 1.5; -webkit-font-smoothing: antialiased; }
+  [hidden] { display: none !important; }
+  .wrap { max-width: 1080px; margin: 0 auto; padding: 24px 20px 48px; }
+  a { color: var(--accent); }
+
+  header.app { display: flex; flex-wrap: wrap; align-items: flex-start; justify-content: space-between; gap: 12px 16px; margin-bottom: 18px; }
+  header.app > div:first-child { flex: 1 1 260px; }
+  header.app h1 { font-size: 1.5rem; margin: 0 0 4px; letter-spacing: -0.01em; }
+  header.app p { margin: 0; color: var(--muted); font-size: .92rem; max-width: 64ch; }
+  .hdr-actions { display: flex; gap: 8px; flex: none; flex-wrap: wrap; justify-content: flex-end; }
+  .theme-toggle { flex: none; border: 1px solid var(--border); background: var(--surface); color: var(--text); border-radius: 999px; padding: 8px 14px; cursor: pointer; font-size: .85rem; font-family: var(--sans); }
+  .theme-toggle:hover { background: var(--surface-2); }
+  .backlink { display: inline-block; color: var(--muted); text-decoration: none; font-size: .82rem; margin: 0 0 10px; }
+  .backlink:hover { color: var(--accent); }
+  .banner { background: color-mix(in srgb, var(--danger) 12%, var(--surface)); border: 1px solid var(--danger); color: var(--text); padding: 10px 14px; border-radius: 10px; margin: 0 0 16px; font-size: .88rem; }
+
+  .btn { border: 1px solid var(--border); background: var(--surface); color: var(--text); border-radius: 9px; padding: 10px 16px; font-size: .9rem; cursor: pointer; display: inline-flex; align-items: center; gap: 7px; font-family: var(--sans); white-space: nowrap; text-decoration: none; line-height: 1.2; }
+  .btn:hover { border-color: var(--accent); color: var(--accent); }
+  .btn.primary { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); font-weight: 600; }
+  .btn.primary:hover { filter: brightness(1.05); color: var(--accent-ink); }
+  .btn.danger:hover { border-color: var(--danger); color: var(--danger); }
+  .btn:disabled { opacity: .6; cursor: progress; }
+
+  /* ---- add bar ---- */
+  .add { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 16px; margin-bottom: 26px; }
+  .add .row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+  .add .row.between { justify-content: space-between; }
+  .add input { flex: 1 1 260px; min-width: 0; padding: 10px 12px; border: 1px solid var(--border); background: var(--bg); color: var(--text); border-radius: 9px; font-size: 1rem; font-family: var(--sans); }
+  .add input:focus { outline: 2px solid var(--accent); outline-offset: 1px; border-color: var(--accent); }
+  .add .hint { margin: 10px 0 0; color: var(--muted); font-size: .82rem; }
+  .add .hint.tight { margin: 0; }
+  .hint.err, .err { color: var(--danger); }
+
+  /* ---- list ---- */
+  .cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 16px; }
+  .card { display: flex; flex-direction: column; text-decoration: none; color: inherit; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden; transition: transform .12s ease, box-shadow .12s ease, border-color .12s ease; }
+  .card:hover { transform: translateY(-3px); box-shadow: var(--shadow-lg); border-color: var(--accent); }
+  .card .thumb { aspect-ratio: 4 / 3; background: var(--surface-2); display: flex; align-items: center; justify-content: center; font-size: 2.4rem; }
+  .card .thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .card .body { padding: 12px 14px 14px; }
+  .card h3 { font-size: 1rem; margin: 0 0 4px; line-height: 1.3; }
+  .card .meta { color: var(--muted); font-size: .8rem; margin: 0; }
+  .empty, .status { color: var(--muted); text-align: center; padding: 48px 16px; }
+  .status.error { color: var(--danger); }
+  .status .btn { margin-top: 12px; }
+
+  /* ---- recipe ---- */
+  .recipe h2 { font-size: 1.7rem; margin: 6px 0 8px; letter-spacing: -0.01em; line-height: 1.2; }
+  .recipe .meta { display: flex; flex-wrap: wrap; gap: 6px 18px; color: var(--muted); font-size: .88rem; margin: 0 0 16px; }
+  .recipe .meta b { color: var(--text); font-weight: 600; }
+  .recipe .meta b.est { font-weight: 500; border-bottom: 1px dotted var(--muted); cursor: help; }
+  .recipe .hero { width: 100%; max-height: 380px; object-fit: cover; border-radius: var(--radius); border: 1px solid var(--border); display: block; margin: 0 0 16px; }
+  .recipe .desc { color: var(--muted); margin: 0 0 22px; max-width: 72ch; white-space: pre-line; }
+  .recipe .actions { display: flex; gap: 8px; flex-wrap: wrap; margin: 0 0 16px; }
+  .topline { display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; }
+  .cols { display: grid; grid-template-columns: minmax(240px, 1fr) 2fr; gap: 24px; align-items: start; }
+  .panel { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 18px 20px; }
+  .panel h3 { margin: 0 0 10px; font-size: 1.05rem; }
+  .panel h4 { margin: 18px 0 8px; font-size: .9rem; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; }
+  .panel h4:first-of-type { margin-top: 0; }
+  .ingredients ul { margin: 0; padding-left: 20px; }
+  .ingredients li { margin: 0 0 7px; }
+  .steps ol { margin: 0; padding-left: 22px; }
+  .steps li { margin: 0 0 12px; }
+  .cols.sticky .ingredients { position: sticky; top: 16px; }
+  @media (max-width: 720px) { .cols { grid-template-columns: 1fr; } .cols.sticky .ingredients { position: static; } }
+
+  /* ---- editor ---- */
+  .editor { max-width: 760px; }
+  .editor h2 { font-size: 1.4rem; margin: 0 0 14px; }
+  .editor label { display: block; margin: 0 0 12px; font-size: .84rem; color: var(--muted); }
+  .editor input, .editor textarea { display: block; width: 100%; margin-top: 4px; padding: 9px 11px; border: 1px solid var(--border); background: var(--bg); color: var(--text); border-radius: 8px; font: inherit; font-size: .95rem; }
+  .editor textarea { resize: vertical; line-height: 1.45; }
+  .editor input:focus, .editor textarea:focus { outline: 2px solid var(--accent); outline-offset: 1px; border-color: var(--accent); }
+  .editor .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 0 14px; }
+  .editor .actions { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin-top: 6px; }
+  .editor .note { font-size: .8rem; color: var(--muted); margin: -6px 0 12px; }
+
+  /* ---- tabs ---- */
+  nav.tabs { display: flex; gap: 8px; margin: 0 0 18px; }
+  nav.tabs a { font-size: .85rem; color: var(--muted); text-decoration: none; border: 1px solid var(--border); background: var(--surface); border-radius: 999px; padding: 6px 14px; }
+  nav.tabs a:hover { color: var(--accent); border-color: var(--accent); }
+  nav.tabs a[aria-current="page"] { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+
+  /* ---- week planner ---- */
+  .weekhead { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin: 0 0 10px; }
+  .weekhead h2 { font-size: 1.3rem; margin: 0; }
+  .weekhead .actions { display: flex; gap: 8px; flex-wrap: wrap; }
+  .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin: 0 0 16px; }
+  .stat { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 10px 14px; box-shadow: var(--shadow); }
+  .stat .k { font-size: .74rem; color: var(--muted); text-transform: uppercase; letter-spacing: .05em; }
+  .stat .v { font-size: 1.35rem; font-weight: 700; line-height: 1.2; margin: 2px 0; font-variant-numeric: tabular-nums; }
+  .stat .s { font-size: .78rem; color: var(--muted); }
+  .week { display: flex; flex-direction: column; gap: 8px; margin: 0 0 24px; }
+  .slot { display: flex; align-items: flex-start; gap: 10px; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 8px 10px 8px 14px; }
+  .slot .day { width: 2.6em; font-weight: 700; color: var(--muted); font-size: .85rem; flex: none; padding-top: 9px; }
+  .slot .meals { flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+  .mealrow { display: flex; align-items: center; flex-wrap: wrap; gap: 6px 8px; }
+  .mealrow .kind { flex: none; width: 5em; font-size: .72rem; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: .05em; }
+  .mealrow select { flex: 1 1 160px; min-width: 0; padding: 8px 10px; border: 1px solid var(--border); background: var(--bg); color: var(--text); border-radius: 8px; font-size: .95rem; font-family: var(--sans); }
+  .mealrow.blank select { color: var(--muted); }
+  .mealrow .open { font-size: .82rem; white-space: nowrap; text-decoration: none; }
+  .mealrow .slotmeta { flex-basis: 100%; color: var(--muted); font-size: .78rem; padding-left: calc(5em + 8px); min-height: 1em; }
+  .addmeal { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; padding: 2px 0 0 calc(5em + 8px); }
+  .addmeal .plus { border: 1px dashed var(--border); background: none; color: var(--muted); border-radius: 8px; padding: 4px 10px; font-size: .78rem; cursor: pointer; font-family: var(--sans); }
+  .addmeal .plus:hover { border-color: var(--accent); color: var(--accent); }
+  .addmeal .chip { border: 1px solid var(--border); background: var(--surface); color: var(--text); border-radius: 999px; padding: 4px 12px; font-size: .8rem; cursor: pointer; font-family: var(--sans); }
+  .addmeal .chip:hover { border-color: var(--accent); color: var(--accent); }
+  .addmeal .chip.muted { color: var(--muted); border-style: dashed; }
+  @media (max-width: 480px) { .mealrow .slotmeta, .addmeal { padding-left: 0; } }
+  .iconbtn { cursor: pointer; border: 1px solid var(--border); background: var(--surface); color: var(--text); border-radius: 8px; padding: 7px 10px; font-size: .9rem; font-family: var(--sans); flex: none; }
+  .iconbtn:hover { border-color: var(--accent); color: var(--accent); }
+
+  /* ---- shopping list ---- */
+  .shopping h3 { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+  .shopping h3 .small { font-size: .8rem; font-weight: 400; color: var(--muted); cursor: pointer; background: none; border: 0; padding: 0; font-family: var(--sans); }
+  .shopping h3 .small:hover { color: var(--accent); }
+  .shopping h4.aisle { margin: 18px 0 2px; font-size: .76rem; font-weight: 700; color: var(--accent); text-transform: uppercase; letter-spacing: .07em; }
+  .shopping h4.aisle:first-of-type { margin-top: 8px; }
+  .shopping .from { display: block; color: var(--muted); font-size: .74rem; margin-top: 1px; }
+  .shopping details { margin: 18px 0 0; }
+  .shopping summary { cursor: pointer; color: var(--muted); font-size: .84rem; padding: 4px 0; }
+  .shopping summary:hover { color: var(--accent); }
+  .shopping .remove { flex: none; border: 0; background: none; color: var(--muted); cursor: pointer; font-size: 1.1rem; line-height: 1; padding: 4px 2px 4px 6px; font-family: var(--sans); }
+  .shopping .remove:hover { color: var(--danger); }
+  .shopping .additem { display: flex; gap: 8px; margin: 16px 0 0; }
+  .shopping .additem input { flex: 1 1 auto; min-width: 0; padding: 9px 11px; border: 1px solid var(--border); background: var(--bg); color: var(--text); border-radius: 8px; font-size: .9rem; font-family: var(--sans); }
+  .shopping .additem input:focus { outline: 2px solid var(--accent); outline-offset: 1px; border-color: var(--accent); }
+  .planhint { color: var(--muted); font-size: .8rem; margin: 0 0 12px; }
+  .shopping ul { list-style: none; margin: 0; padding: 0; }
+  .shopping li { display: flex; align-items: flex-start; gap: 8px; }
+  .shopping label { display: flex; gap: 10px; align-items: flex-start; padding: 5px 0; cursor: pointer; flex: 1 1 auto; min-width: 0; }
+  .shopping input { margin: 4px 0 0; flex: none; accent-color: var(--accent); }
+  .shopping label.done span { text-decoration: line-through; color: var(--muted); }
+  .price { flex: none; margin-left: auto; min-width: 5.5em; text-align: right; padding: 5px 0 5px 8px; color: var(--muted); font-size: .82rem; white-space: nowrap; cursor: pointer; border: 0; background: none; font-family: var(--sans); font-variant-numeric: tabular-nums; }
+  .price:hover { color: var(--accent); }
+  .price.set { color: var(--text); font-weight: 600; }
+  .price.unknown { opacity: .75; }
+  .shopping .total { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; border-top: 2px solid var(--border); margin-top: 16px; padding-top: 10px; font-weight: 700; font-size: 1.05rem; }
+  .shopping .total b { font-variant-numeric: tabular-nums; font-size: 1.2rem; }
+  .shopping .total .n { font-weight: 400; color: var(--muted); font-size: .8rem; }
+  .shopping .foot { color: var(--muted); font-size: .8rem; margin: 10px 0 0; }
+
+  footer.app { margin-top: 30px; color: var(--muted); font-size: .8rem; text-align: center; }
+
+  /* ---- dialog ---- */
+  dialog { border: 1px solid var(--border); background: var(--surface); color: var(--text); border-radius: var(--radius); padding: 20px 22px; max-width: 440px; width: calc(100% - 32px); box-shadow: var(--shadow-lg); }
+  dialog::backdrop { background: rgba(0, 0, 0, .45); }
+  dialog h3 { margin: 0 0 6px; font-size: 1.1rem; }
+  dialog p { margin: 0 0 12px; color: var(--muted); font-size: .9rem; }
+  dialog input { width: 100%; padding: 10px 12px; border: 1px solid var(--border); background: var(--bg); color: var(--text); border-radius: 9px; font-size: 1rem; font-family: var(--mono); }
+  dialog .actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 14px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="app">
+    <div>
+      <h1>Cookbook</h1>
+      <p>Save a recipe from a link or write your own. Plan the week&rsquo;s meals and shop from one list, shared between us.</p>
+    </div>
+    <div class="hdr-actions">
+      <button class="theme-toggle" id="lockBtn" type="button">&#128274; Unlock editing</button>
+      <button class="theme-toggle" id="themeBtn" type="button" aria-label="Toggle color theme">&#127775; Theme</button>
+    </div>
+  </header>
+  <p class="banner" id="banner" hidden></p>
+
+  <section class="add">
+    <div id="addLocked" class="row between">
+      <p class="hint tight">&#128274; Viewing only. Unlock editing to save recipes from a link or write your own.</p>
+      <button class="btn" type="button" id="unlockBtn">Unlock</button>
+    </div>
+    <form id="addForm" hidden>
+      <div class="row">
+        <input id="urlInput" type="url" inputmode="url" autocomplete="off" placeholder="https://&hellip; paste a recipe link" aria-label="Recipe URL">
+        <button class="btn primary" type="submit" id="saveLinkBtn">Save from link</button>
+        <a class="btn" href="#add">&#9998; Write your own</a>
+      </div>
+      <p class="hint" id="addHint">The link is fetched in the background; the recipe shows up here in under a minute.</p>
+    </form>
+  </section>
+
+  <nav class="tabs" aria-label="Views">
+    <a href="#" id="tabRecipes">Recipes</a>
+    <a href="#week" id="tabWeek">This week</a>
+  </nav>
+
+  <main id="view" aria-live="polite"><p class="status">Loading&hellip;</p></main>
+
+  <footer class="app">Prices and times marked &ldquo;~&rdquo; are rough estimates. Tap a price to set what it really costs at your store.</footer>
+</div>
+
+<dialog id="unlockDlg">
+  <form id="unlockForm">
+    <h3>Unlock editing</h3>
+    <p>Paste the cookbook access token. It stays in this browser only; you&rsquo;ll paste it once per device.</p>
+    <input id="tokenInput" type="password" autocomplete="off" spellcheck="false" placeholder="github_pat_&hellip;" required>
+    <p class="err" id="unlockErr" hidden></p>
+    <div class="actions">
+      <button type="button" class="btn" id="unlockCancel">Cancel</button>
+      <button type="submit" class="btn primary" id="unlockGo">Unlock</button>
+    </div>
+  </form>
+</dialog>
+
+<script>
+(function () {
+  "use strict";
+  // Recipes are JSON files in a GitHub repo. Anyone can read them; writing needs a
+  // fine-grained token for that repo (Contents + Actions: read and write).
+  var OWNER = "mapzimus", REPO = "cookbook", BRANCH = "main";
+  var API = "https://api.github.com/repos/" + OWNER + "/" + REPO;
+  var RAW = "https://raw.githubusercontent.com/" + OWNER + "/" + REPO + "/" + BRANCH + "/";
+  var TOKEN_KEY = "cookbook-token", PLAN_KEY = "cookbook-plan", CHECK_KEY = "cookbook-checked", PRICE_KEY = "cookbook-prices", EXTRA_KEY = "cookbook-extras";
+  var view = document.getElementById("view");
+  var tokenBad = false;
+
+  // ---------- helpers ----------
+  // Never stringify null/undefined into visible text ("null") via textContent or +.
+  function str(value) { return value == null ? "" : String(value); }
+  function el(tag, attrs, children) {
+    var node = document.createElement(tag);
+    if (attrs) Object.keys(attrs).forEach(function (k) {
+      if (k === "text") node.textContent = str(attrs[k]);
+      else if (k === "class") node.className = attrs[k];
+      else if (attrs[k] == null) return;
+      else node.setAttribute(k, attrs[k] === true ? "" : attrs[k]);
+    });
+    (children || []).forEach(function (c) {
+      if (c == null || c === false) return;
+      node.appendChild(typeof c === "string" || typeof c === "number" ? document.createTextNode(str(c)) : c);
+    });
+    return node;
+  }
+  function status(msg, isError, extra) {
+    view.replaceChildren(el("p", { class: "status" + (isError ? " error" : "") }, [msg, extra ? el("br") : null, extra]));
+  }
+  function store(key, value) { try { localStorage.setItem(key, JSON.stringify(value)); } catch (e) {} }
+  function load(key, fallback) {
+    try { var v = JSON.parse(localStorage.getItem(key)); return v === null || v === undefined ? fallback : v; } catch (e) { return fallback; }
+  }
+  function token() { try { return localStorage.getItem(TOKEN_KEY) || ""; } catch (e) { return ""; } }
+  function unlocked() { return !!token() && !tokenBad; }
+  function clamp(v, lo, hi) { return Math.max(lo, Math.min(hi, v)); }
+  function money(v) { return v > 0 && v < 0.05 ? "<$0.05" : "$" + v.toFixed(2); }
+  function nowISO() { return new Date().toISOString().replace(/\.\d{3}Z$/, "Z"); }
+  function escapeRe(s) { return s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"); }
+  function image(src, alt, cls) {
+    if (!src || !/^https?:\/\//i.test(src)) return null;
+    var img = el("img", { src: src, alt: alt || "", class: cls || "", loading: "lazy", referrerpolicy: "no-referrer" });
+    img.addEventListener("error", function () { img.remove(); });
+    return img;
+  }
+  function slugify(text) {
+    return String(text || "").normalize("NFKD").replace(/[̀-ͯ]/g, "").toLowerCase()
+      .replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 80).replace(/-+$/, "") || "recipe";
+  }
+  function showBanner(msg) { var b = document.getElementById("banner"); b.textContent = msg || ""; b.hidden = !msg; }
+
+  // ---------- GitHub data layer ----------
+  function api(method, path, body, accept) {
+    var h = { Accept: accept || "application/vnd.github+json", "X-GitHub-Api-Version": "2022-11-28", Authorization: "Bearer " + token() };
+    if (body) h["Content-Type"] = "application/json";
+    return fetch(API + path, { method: method, headers: h, body: body ? JSON.stringify(body) : undefined, cache: "no-store" }).then(function (r) {
+      if (r.status === 401) { tokenBad = true; renderLock(); }
+      if (!r.ok) {
+        return r.text().then(function (t) {
+          var msg = ""; try { msg = JSON.parse(t).message || ""; } catch (e) {}
+          var err = new Error(msg || ("HTTP " + r.status)); err.status = r.status; throw err;
+        });
+      }
+      return r.status === 204 ? null : r.json();
+    });
+  }
+  function rawJSON(path) {
+    return fetch(RAW + path + "?t=" + Date.now(), { cache: "no-store" }).then(function (r) {
+      if (!r.ok) { var err = new Error("HTTP " + r.status + " loading " + path); err.status = r.status; throw err; }
+      return r.json();
+    });
+  }
+  // With a token, read through the API (always fresh). Without one, the raw CDN copy.
+  function readJSON(path) {
+    if (!unlocked()) return rawJSON(path);
+    return api("GET", "/contents/" + path + "?ref=" + BRANCH, null, "application/vnd.github.raw+json")
+      .catch(function (e) { if (e.status === 404) throw e; return rawJSON(path); });
+  }
+  // One commit touching several files (Git Data API). changes: [{path, content|null}]; null deletes.
+  function commit(message, changes) {
+    return api("GET", "/git/ref/heads/" + BRANCH).then(function (ref) {
+      var head = ref.object.sha;
+      return api("GET", "/git/commits/" + head).then(function (c) {
+        return api("POST", "/git/trees", {
+          base_tree: c.tree.sha,
+          tree: changes.map(function (ch) {
+            return ch.content == null
+              ? { path: ch.path, mode: "100644", type: "blob", sha: null }
+              : { path: ch.path, mode: "100644", type: "blob", content: ch.content };
+          })
+        });
+      }).then(function (t) {
+        return api("POST", "/git/commits", { message: message, tree: t.sha, parents: [head] });
+      }).then(function (nc) {
+        return api("PATCH", "/git/refs/heads/" + BRANCH, { sha: nc.sha });
+      });
+    });
+  }
+  // Re-read the index, build the change set from it, commit; retry if someone else got there first.
+  function transact(build, attempt) {
+    attempt = attempt || 1;
+    return loadIndex(true).then(function (index) {
+      var tx = build(index);
+      return commit(tx.message, tx.changes).then(function () { return tx.index; });
+    }).catch(function (e) {
+      if (attempt < 3 && (e.status === 409 || e.status === 422)) return transact(build, attempt + 1);
+      throw e;
+    });
+  }
+  function pretty(obj) {
+    // Drop JSON nulls so empty fields never surface as the literal word "null" in data or UI.
+    return JSON.stringify(obj, function (_k, v) { return v === null ? undefined : v; }, 1) + "\n";
+  }
+
+  // ---------- recipes ----------
+  var indexCache = null, recipeCache = {};
+  function loadIndex(force) {
+    if (indexCache && !force) return Promise.resolve(indexCache);
+    return readJSON("index.json").then(function (items) {
+      indexCache = (Array.isArray(items) ? items : []).filter(function (r) { return r && r.slug; });
+      return indexCache;
+    });
+  }
+  function loadRecipe(slug) {
+    if (!recipeCache[slug]) {
+      recipeCache[slug] = readJSON("recipes/" + encodeURIComponent(slug) + ".json")
+        .catch(function (e) { delete recipeCache[slug]; throw e; });
+    }
+    return recipeCache[slug];
+  }
+  function indexEntry(r) {
+    return { slug: r.slug, name: r.name || r.slug, site: r.site || null, source: r.source || null, image: r.image || null,
+      prepTime: r.prepTime || null, cookTime: r.cookTime || null, totalTime: r.totalTime || null, savedAt: r.savedAt || null };
+  }
+  function sortIndex(items) {
+    return items.slice().sort(function (a, b) { return String(b.savedAt || "").localeCompare(String(a.savedAt || "")); });
+  }
+  function saveRecipe(recipe, verb) {
+    return transact(function (index) {
+      var newIndex = sortIndex(index.filter(function (r) { return r.slug !== recipe.slug; }).concat([indexEntry(recipe)]));
+      return {
+        message: "Cookbook: " + verb + " \"" + (recipe.name || recipe.slug) + "\"",
+        changes: [{ path: "recipes/" + recipe.slug + ".json", content: pretty(recipe) }, { path: "index.json", content: pretty(newIndex) }],
+        index: newIndex
+      };
+    }).then(function (newIndex) { indexCache = newIndex; recipeCache[recipe.slug] = Promise.resolve(recipe); });
+  }
+  function deleteRecipe(recipe) {
+    return readJSON(PLAN_FILE).catch(function () { return null; }).then(function (raw) {
+      return transact(function (index) {
+        var newIndex = index.filter(function (r) { return r.slug !== recipe.slug; });
+        var changes = [
+          { path: "recipes/" + recipe.slug + ".json", content: null },
+          { path: "index.json", content: pretty(newIndex) }
+        ];
+        // Clear this recipe out of the shared week so slots don't go blank/"null".
+        if (raw && Array.isArray(raw.days)) {
+          var days = normalizePlan(raw.days);
+          var changed = false;
+          days.forEach(function (day) {
+            day.forEach(function (m) {
+              if (m.slug === recipe.slug) { m.slug = ""; changed = true; }
+            });
+          });
+          if (changed) {
+            changes.push({
+              path: PLAN_FILE,
+              content: pretty({
+                days: days,
+                checked: plainObject(raw.checked),
+                extras: Array.isArray(raw.extras) ? raw.extras : [],
+                updatedAt: nowISO()
+              })
+            });
+          }
+        }
+        return {
+          message: "Cookbook: delete \"" + (recipe.name || recipe.slug) + "\"",
+          changes: changes,
+          index: newIndex
+        };
+      });
+    }).then(function (newIndex) {
+      indexCache = newIndex;
+      delete recipeCache[recipe.slug];
+      if (shared && Array.isArray(shared.days)) {
+        shared.days = normalizePlan(shared.days);
+        shared.days.forEach(function (day) {
+          day.forEach(function (m) { if (m.slug === recipe.slug) m.slug = ""; });
+        });
+      }
+    });
+  }
+  function loadError(e) {
+    return location.protocol === "file:"
+      ? "This page needs to be served over HTTP to load the cookbook."
+      : "Couldn't load the cookbook (" + e.message + ").";
+  }
+
+  // ---------- times ----------
+  function minutes(text) {   // "1 hr 30 min", "45 mins", "1 hour", "90" -> minutes, else null
+    if (text == null || text === "") return null;
+    var s = String(text).toLowerCase();
+    var h = /(\d+(?:\.\d+)?)\s*(?:h|hr|hrs|hour|hours)\b/.exec(s), m = /(\d+)\s*(?:m|min|mins|minute|minutes)\b/.exec(s);
+    if (!h && !m) { var n = /^\s*(\d+)\s*$/.exec(s); return n ? +n[1] : null; }
+    return Math.round((h ? +h[1] * 60 : 0) + (m ? +m[1] : 0));
+  }
+  function fmtMin(n) {
+    if (n == null) return "";
+    var h = Math.floor(n / 60), m = Math.round(n % 60);
+    return [h ? h + " hr" : "", m || !h ? m + " min" : ""].filter(Boolean).join(" ");
+  }
+  function stepCount(r) { return (r.instructions || []).reduce(function (a, s) { return a + (s.steps || []).length; }, 0); }
+  // Prep/cook from the recipe when it has them; otherwise a rough guess from its size.
+  function timeInfo(r) {
+    var prep = minutes(r.prepTime), cook = minutes(r.cookTime), total = minutes(r.totalTime), est = false;
+    if (prep == null && cook != null && total != null && total > cook) prep = total - cook;
+    if (cook == null && prep != null && total != null && total > prep) cook = total - prep;
+    if (prep == null && cook == null && total != null) { prep = Math.round(total / 3); cook = total - prep; est = true; }
+    if (prep == null) { prep = clamp(5 + 2 * (r.ingredients || []).length, 5, 45); est = true; }
+    if (cook == null) { cook = clamp(5 * stepCount(r), 10, 120); est = true; }
+    if (total == null) total = prep + cook;
+    return { prep: prep, cook: cook, total: total, estimated: est };
+  }
+
+  // ---------- grocery prices ----------
+  // Typical US supermarket prices, 2026-ish: per pound, per cup, per item, per package. Rough on purpose.
+  var PRICES = [
+    ["#Meat & seafood", null],
+    ["chicken breast|boneless skinless chicken", { lb: 4.5, each: 2.5 }],
+    ["chicken thigh|chicken leg|drumstick", { lb: 3.5, each: 1.2 }],
+    ["chicken wing", { lb: 3.5, each: 0.5 }],
+    ["whole chicken|rotisserie chicken", { lb: 2, each: 10 }],
+    ["ground chicken|ground turkey|turkey mince|chicken mince", { lb: 5 }],
+    ["turkey breast|turkey", { lb: 5 }],
+    ["chicken", { lb: 4, each: 2 }],
+    ["ground beef|minced beef|beef mince|hamburger|ground chuck", { lb: 6 }],
+    ["beef tenderloin|filet mignon", { lb: 24 }],
+    ["short rib", { lb: 10 }],
+    ["brisket", { lb: 8 }],
+    ["chuck roast|pot roast|stew meat|stewing beef|chuck", { lb: 7 }],
+    ["steak|sirloin|ribeye|rib eye|scotch fillet|strip steak|new york strip|flank|skirt|tri tip|t bone|porterhouse", { lb: 13 }],
+    ["beef", { lb: 8 }],
+    ["pork chop", { lb: 4.5, each: 3 }],
+    ["pork tenderloin", { lb: 5 }],
+    ["pork shoulder|pork butt|boston butt|pork roast", { lb: 3 }],
+    ["pork belly", { lb: 6 }],
+    ["ground pork|pork mince", { lb: 5 }],
+    ["bacon|pancetta", { lb: 7, each: 0.45 }],
+    ["prosciutto|serrano ham", { lb: 20 }],
+    ["pepperoni|salami", { lb: 9 }],
+    ["hot dog|frankfurter", { lb: 4, each: 0.6 }],
+    ["italian sausage|bratwurst|chorizo|kielbasa|andouille|breakfast sausage|sausage", { lb: 6, each: 1.5 }],
+    ["ham", { lb: 5 }],
+    ["pork", { lb: 4.5 }],
+    ["lamb", { lb: 12 }],
+    ["salmon", { lb: 12, each: 6 }],
+    ["shrimp|prawn", { lb: 10 }],
+    ["cod|haddock|pollock|white fish|whitefish", { lb: 10, each: 5 }],
+    ["tilapia|catfish", { lb: 7, each: 3.5 }],
+    ["halibut|sea bass|swordfish|mahi", { lb: 22, each: 10 }],
+    ["canned tuna|tuna", { lb: 14, pack: 1.6, each: 1.6 }],
+    ["scallop", { lb: 22 }],
+    ["crab", { lb: 16, pack: 8 }],
+    ["mussel|clam", { lb: 5 }],
+    ["anchov|sardine", { pack: 3, each: 0.3 }],
+    ["fish", { lb: 10 }],
+    ["tofu", { lb: 3, pack: 2.5, each: 2.5 }],
+    ["tempeh", { pack: 3.5 }],
+    ["egg white|egg yolk|egg", { each: 0.35, cup: 1.4 }],
+    ["#Dairy & eggs", null],
+    ["unsalted butter|salted butter|butter", { lb: 5, cup: 2.5, each: 1.25 }],
+    ["heavy cream|whipping cream|double cream|thickened cream", { cup: 1.5, pack: 3 }],
+    ["half and half|half-and-half|light cream|single cream", { cup: 0.8, pack: 3 }],
+    ["sour cream|creme fraiche|crème fraîche", { cup: 1.2, pack: 2.5 }],
+    ["cream cheese|mascarpone", { cup: 2, lb: 5, pack: 2.5, each: 2.5 }],
+    ["greek yogurt|yogurt|yoghurt", { cup: 1.5, pack: 5, each: 1.2 }],
+    ["buttermilk", { cup: 0.5, pack: 3 }],
+    ["whole milk|skim milk|milk", { cup: 0.3, pack: 4 }],
+    ["condensed milk|evaporated milk", { pack: 2.5, cup: 2 }],
+    ["parmesan|parmigiano|pecorino|grana padano|romano", { lb: 12, cup: 3 }],
+    ["mozzarella|fresh mozzarella", { lb: 6, cup: 1.6, pack: 4 }],
+    ["cheddar|monterey jack|pepper jack|colby|gouda|swiss cheese|gruyere|gruyère|provolone|fontina|havarti", { lb: 6.5, cup: 1.7, pack: 4 }],
+    ["feta|goat cheese|blue cheese|gorgonzola", { lb: 10, cup: 2.5, pack: 4 }],
+    ["ricotta|cottage cheese", { cup: 1.6, pack: 3.5 }],
+    ["brie|camembert", { lb: 12, each: 6 }],
+    ["cheese", { lb: 6.5, cup: 1.7, pack: 4 }],
+    ["cream", { cup: 1.5, pack: 3 }],
+    ["ice cream", { cup: 1, pack: 5 }],
+    ["#Produce", null],
+    ["green onion|scallion|spring onion", { each: 0.15, pack: 1, cup: 0.6 }],
+    ["red onion|yellow onion|white onion|sweet onion|onion", { each: 0.7, lb: 1.2, cup: 0.6 }],
+    ["shallot", { each: 0.6, lb: 4 }],
+    ["garlic powder|onion powder", { cup: 6, pantry: true }],
+    ["garlic", { each: 0.7, lb: 4, cup: 3 }],
+    ["leek", { each: 1.5, lb: 2.5 }],
+    ["cherry tomato|grape tomato", { cup: 1.5, lb: 3.5, pack: 3.5 }],
+    ["sun dried tomato|sun-dried tomato", { cup: 4, pack: 4 }],
+    ["tomato paste", { cup: 1.6, pack: 1, each: 1 }],
+    ["crushed tomato|diced tomato|whole tomato|canned tomato|tomato sauce|tomato puree|tomato passata|passata|fire roasted tomato", { pack: 1.5, cup: 0.75, each: 1.5 }],
+    ["roma tomato|plum tomato|tomato", { each: 0.8, lb: 2, cup: 0.9 }],
+    ["sweet potato|yam", { each: 1, lb: 1.5 }],
+    ["russet potato|yukon gold|red potato|baby potato|potato", { each: 0.6, lb: 1.2, cup: 0.5 }],
+    ["carrot", { each: 0.3, lb: 1.2, cup: 0.5 }],
+    ["celery", { each: 0.3, pack: 2.5, cup: 0.5 }],
+    ["bell pepper|capsicum|red pepper|green pepper|yellow pepper|orange pepper", { each: 1.3, lb: 2.5, cup: 1 }],
+    ["jalapeno|jalapeño|serrano|habanero|poblano|chili pepper|chile|chilli|thai chili|bird's eye", { each: 0.3, lb: 3 }],
+    ["mushroom|cremini|button mushroom|portobello|shiitake", { lb: 4.5, cup: 1.2, each: 0.35, pack: 3 }],
+    ["zucchini|courgette|yellow squash", { each: 0.9, lb: 1.8, cup: 0.7 }],
+    ["butternut|acorn squash|squash|pumpkin", { each: 3, lb: 1.5, cup: 1, pack: 2.5 }],
+    ["eggplant|aubergine", { each: 2, lb: 2 }],
+    ["cucumber", { each: 1, lb: 1.5 }],
+    ["romaine|iceberg|lettuce|mixed greens|salad greens|spring mix", { pack: 3, each: 2.5, cup: 0.5 }],
+    ["baby spinach|spinach", { lb: 6, cup: 0.6, pack: 4 }],
+    ["kale|chard|collard", { pack: 2.5, each: 2.5, cup: 0.5 }],
+    ["arugula|rocket|watercress", { pack: 4, cup: 0.8 }],
+    ["cabbage|napa cabbage|coleslaw mix|slaw", { each: 2.5, lb: 1, cup: 0.4, pack: 3 }],
+    ["broccoli", { each: 2.5, lb: 2.5, cup: 0.8, pack: 3 }],
+    ["cauliflower", { each: 3.5, lb: 2.5, cup: 0.8, pack: 3 }],
+    ["brussels sprout", { lb: 3.5, cup: 1.2, pack: 3.5 }],
+    ["asparagus", { lb: 4, pack: 4 }],
+    ["green bean|string bean|haricot", { lb: 3, cup: 1, pack: 3 }],
+    ["snap pea|snow pea|frozen pea|pea", { cup: 1, pack: 2.5 }],
+    ["corn on the cob|ear of corn|sweet corn|frozen corn|canned corn|corn kernel|corn", { each: 0.6, cup: 0.8, pack: 1.5 }],
+    ["avocado|guacamole", { each: 1.5, cup: 3 }],
+    ["lemon juice", { cup: 3 }],
+    ["lime juice", { cup: 3 }],
+    ["lemon zest|lime zest|orange zest|zest", { cup: 8, pantry: true }],
+    ["lemon", { each: 0.7 }],
+    ["lime", { each: 0.4 }],
+    ["orange juice", { cup: 0.6 }],
+    ["orange|clementine|mandarin", { each: 0.8, lb: 1.5 }],
+    ["apple", { each: 0.9, lb: 2 }],
+    ["banana", { each: 0.3, lb: 0.7 }],
+    ["strawberry|strawberries", { lb: 4, cup: 2, pack: 4 }],
+    ["blueberry|blueberries", { cup: 3, pack: 4 }],
+    ["raspberry|raspberries|blackberry|blackberries", { cup: 4, pack: 4 }],
+    ["berry|berries", { cup: 3, pack: 4 }],
+    ["mango|pineapple|peach|nectarine|plum|pear", { each: 1.5, lb: 2, cup: 1.5 }],
+    ["grape", { lb: 3, cup: 1.2 }],
+    ["cherry|cherries", { lb: 5, cup: 2.5 }],
+    ["coconut milk|coconut cream", { pack: 2, cup: 1.2, each: 2 }],
+    ["fresh ginger|ginger", { lb: 4, cup: 4, each: 1 }],
+    ["cilantro|coriander leaves|fresh coriander", { pack: 1, each: 1, cup: 0.3 }],
+    ["parsley", { pack: 1.2, each: 1.2, cup: 0.3 }],
+    ["fresh basil|basil", { pack: 3, each: 3, cup: 1 }],
+    ["mint|dill|chive|rosemary|thyme|sage|tarragon|oregano leaves", { pack: 2.5, each: 2.5, cup: 1.2 }],
+    ["fennel", { each: 2.5, lb: 2.5 }],
+    ["beet", { each: 0.8, lb: 2 }],
+    ["radish", { pack: 1.5, each: 0.1 }],
+    ["bok choy|pak choi", { each: 1.5, lb: 2.5 }],
+    ["bean sprout", { lb: 2, cup: 0.5 }],
+    ["artichoke heart|artichoke", { pack: 3, each: 2.5, cup: 1.5 }],
+    ["olive", { cup: 3, pack: 3.5 }],
+    ["pickle|gherkin|cornichon", { pack: 3.5, each: 0.3, cup: 1.5 }],
+    ["caper", { cup: 6, pack: 3 }],
+    ["edamame", { cup: 1.5, pack: 3 }],
+    ["seaweed|nori", { pack: 3, each: 0.3 }],
+    ["#Pantry", null],
+    ["all purpose flour|all-purpose flour|plain flour|bread flour|whole wheat flour|flour", { cup: 0.25, lb: 0.8, pantry: true }],
+    ["cornstarch|corn starch|cornflour|arrowroot", { cup: 0.8, pantry: true }],
+    ["baking soda|baking powder|bicarbonate|cream of tartar|yeast", { cup: 1.5, pack: 1.5, pantry: true }],
+    ["brown sugar", { cup: 0.6, lb: 1, pantry: true }],
+    ["powdered sugar|icing sugar|confectioners", { cup: 0.6, lb: 1.2, pantry: true }],
+    ["granulated sugar|caster sugar|white sugar|sugar", { cup: 0.4, lb: 0.9, pantry: true }],
+    ["honey", { cup: 5, pack: 6, pantry: true }],
+    ["maple syrup", { cup: 6, pack: 9, pantry: true }],
+    ["molasses|golden syrup|corn syrup|agave", { cup: 3, pack: 4, pantry: true }],
+    ["vanilla", { cup: 40, pack: 8, pantry: true }],
+    ["cocoa|cacao", { cup: 2.5, pack: 4, pantry: true }],
+    ["chocolate chip|chocolate", { cup: 2.5, lb: 8, pack: 3.5 }],
+    ["kosher salt|sea salt|salt and pepper|salt & pepper|salt", { cup: 1, pantry: true }],
+    ["black pepper|white pepper|pepper", { cup: 8, pantry: true }],
+    ["olive oil|extra virgin", { cup: 3, pack: 10, pantry: true }],
+    ["sesame oil", { cup: 6, pack: 6, pantry: true }],
+    ["coconut oil|avocado oil", { cup: 3, pack: 8, pantry: true }],
+    ["vegetable oil|canola oil|sunflower oil|neutral oil|cooking oil|peanut oil|oil", { cup: 0.6, pack: 5, pantry: true }],
+    ["cooking spray|nonstick spray", { pack: 4, pantry: true }],
+    ["balsamic", { cup: 3, pack: 5, pantry: true }],
+    ["rice vinegar|rice wine vinegar|apple cider vinegar|red wine vinegar|white wine vinegar|sherry vinegar|vinegar", { cup: 0.8, pack: 3, pantry: true }],
+    ["soy sauce|tamari|shoyu", { cup: 1.5, pack: 3.5, pantry: true }],
+    ["fish sauce|oyster sauce|hoisin", { cup: 2.5, pack: 4, pantry: true }],
+    ["worcestershire", { cup: 2, pack: 3.5, pantry: true }],
+    ["sriracha|hot sauce|tabasco|chili garlic sauce|sambal|gochujang|harissa", { cup: 3, pack: 4, pantry: true }],
+    ["dijon|whole grain mustard|yellow mustard|mustard", { cup: 2, pack: 3, pantry: true }],
+    ["ketchup", { cup: 1, pack: 3, pantry: true }],
+    ["mayonnaise|mayo|aioli", { cup: 1.5, pack: 4, pantry: true }],
+    ["bbq sauce|barbecue sauce", { cup: 1.5, pack: 3 }],
+    ["salsa", { cup: 1.5, pack: 3 }],
+    ["marinara|pasta sauce|pizza sauce|spaghetti sauce", { cup: 1.2, pack: 3 }],
+    ["pesto", { cup: 4, pack: 4 }],
+    ["curry paste|thai curry", { cup: 6, pack: 3 }],
+    ["curry powder|garam masala|turmeric|cumin|paprika|smoked paprika|chili powder|chilli powder|cayenne|red pepper flake|chili flake|oregano|dried thyme|dried rosemary|dried basil|italian seasoning|herbes de provence|cinnamon|nutmeg|clove|allspice|cardamom|ground coriander|coriander|ground ginger|bay leaf|bay leaves|cajun seasoning|cajun|old bay|taco seasoning|seasoning|spice|za'atar|sumac|fennel seed|mustard seed|celery salt|five spice|star anise|saffron|dried dill|dried oregano|dried parsley|mixed herbs|everything bagel|msg|chicken bouillon|bouillon|stock cube", { cup: 8, pack: 3, pantry: true }],
+    ["peanut butter|almond butter|tahini", { cup: 2.5, pack: 4, pantry: true }],
+    ["nutella|hazelnut spread", { cup: 3, pack: 4 }],
+    ["hummus", { cup: 3, pack: 4 }],
+    ["jam|jelly|preserves|marmalade", { cup: 3, pack: 4, pantry: true }],
+    ["chicken broth|chicken stock|beef broth|beef stock|vegetable broth|vegetable stock|bone broth|broth|stock", { cup: 0.6, pack: 3, each: 1.5 }],
+    ["cream of mushroom|cream of chicken|condensed soup", { pack: 1.5, each: 1.5, cup: 1.2 }],
+    ["white wine|red wine|dry white|dry red|cooking wine|sherry|marsala|vermouth|wine", { cup: 2.5, pack: 10 }],
+    ["beer|lager|stout", { pack: 1.5, each: 1.5, cup: 0.6 }],
+    ["brandy|bourbon|whiskey|rum|vodka|tequila|mirin|sake|shaoxing", { cup: 6, pack: 15 }],
+    ["basmati|jasmine rice|brown rice|arborio|sushi rice|white rice|long grain|rice", { cup: 0.5, lb: 1.2, pack: 3 }],
+    ["quinoa|farro|barley|bulgur|freekeh|couscous|polenta|cornmeal|grits", { cup: 1, lb: 2.5, pack: 3.5 }],
+    ["rolled oats|old fashioned oats|steel cut|oatmeal|oats", { cup: 0.4, pack: 4 }],
+    ["granola|cereal", { cup: 1.5, pack: 4.5 }],
+    ["red lentil|green lentil|brown lentil|lentil", { cup: 0.6, lb: 1.8, pack: 2.5 }],
+    ["black bean|kidney bean|pinto bean|cannellini|white bean|navy bean|great northern|chickpea|garbanzo|refried bean|baked bean|butter bean|lima bean|bean", { pack: 1.2, each: 1.2, cup: 0.6, lb: 1.8 }],
+    ["egg noodle|rice noodle|udon|soba|ramen|lo mein|glass noodle|vermicelli|noodle", { lb: 2.5, cup: 0.8, pack: 2.5, each: 0.6 }],
+    ["lasagna|lasagne|ravioli|tortellini|gnocchi", { pack: 3.5, lb: 3.5 }],
+    ["spaghetti|penne|fettuccine|linguine|rigatoni|macaroni|elbow|fusilli|rotini|farfalle|bow tie|orzo|ziti|shells|angel hair|tagliatelle|pappardelle|bucatini|cavatappi|pasta", { lb: 1.6, cup: 0.6, pack: 1.6 }],
+    ["panko|breadcrumb|bread crumb|crouton", { cup: 0.8, pack: 3 }],
+    ["tortilla chip|potato chip|crackers|cracker|pretzel|chips", { pack: 4, cup: 0.8 }],
+    ["tortilla|wrap", { each: 0.3, pack: 3 }],
+    ["pita|naan|flatbread", { each: 0.8, pack: 3.5 }],
+    ["hamburger bun|hot dog bun|brioche bun|bun|dinner roll|slider", { each: 0.5, pack: 3.5 }],
+    ["baguette|ciabatta|sourdough|french bread", { each: 3.5 }],
+    ["sandwich bread|white bread|whole wheat bread|bread", { each: 3.5, pack: 3.5 }],
+    ["puff pastry|phyllo|filo|pie crust|pizza dough|crescent roll|biscuit dough|wonton wrapper|dumpling wrapper", { pack: 4.5, each: 4 }],
+    ["graham cracker", { cup: 1, pack: 4 }],
+    ["almond flour|almond meal", { cup: 2.5, pack: 8 }],
+    ["almond", { cup: 4, lb: 8 }],
+    ["walnut|pecan|hazelnut|macadamia", { cup: 4.5, lb: 10 }],
+    ["cashew|pistachio", { cup: 4, lb: 9 }],
+    ["pine nut", { cup: 12 }],
+    ["peanut", { cup: 2, lb: 4 }],
+    ["nuts", { cup: 4, lb: 8 }],
+    ["chia seed|flax|hemp seed", { cup: 4, pack: 6 }],
+    ["sesame seed|sunflower seed|pumpkin seed|pepita|poppy seed", { cup: 3, pack: 4, pantry: true }],
+    ["raisin|dried cranberr|craisin|dried cherr|dried apricot|date|dried fig|dried fruit|prune", { cup: 2.5, pack: 4 }],
+    ["shredded coconut|coconut flake|desiccated coconut", { cup: 1.5, pack: 3 }],
+    ["gelatin|pectin|agar", { pack: 2.5, pantry: true }],
+    ["sprinkles|food coloring|food colouring", { pack: 3, pantry: true }],
+    ["marshmallow", { cup: 0.8, pack: 2.5 }],
+    ["espresso|coffee|instant coffee", { cup: 1, pack: 8, pantry: true }],
+    ["green tea|black tea|tea bag|tea", { each: 0.15, pack: 4, pantry: true }],
+    ["water|ice cube|ice", { cup: 0, pantry: true }],
+    ["frozen fries|french fries|tater tot|hash brown", { lb: 2.5, pack: 3.5 }],
+    ["frozen spinach|frozen vegetable|frozen mixed vegetable|stir fry vegetable", { pack: 2.5, cup: 0.8 }],
+    ["frozen berr|frozen fruit", { pack: 4, cup: 1.5 }],
+    ["veggie burger|plant based|beyond|impossible", { each: 2.5, pack: 6, lb: 9 }]
+  ];
+  // Shopping-list sections, in the order you walk a store. A "#Name" row above
+  // sets the aisle for everything under it; these few sit somewhere else.
+  var AISLES = ["Produce", "Meat & seafood", "Dairy & eggs", "Bakery", "Frozen", "Pantry", "Other"];
+  var AISLE_OVERRIDES = [
+    [/frozen|ice cream|tater tot|french fries|hash brown/, "Frozen"],
+    [/tortilla|pita|naan|flatbread|bun|dinner roll|slider|baguette|ciabatta|sourdough|french bread|bread|puff pastry|phyllo|filo|pie crust|pizza dough|crescent|biscuit dough|wonton|dumpling wrapper/, "Bakery"],
+    [/canned|tomato paste|crushed tomato|diced tomato|whole tomato|tomato sauce|tomato puree|passata|fire roasted|coconut milk|coconut cream|olive$|^olive|pickle|gherkin|cornichon|caper|artichoke|seaweed|nori|sun dried|sun-dried|condensed soup|cream of mushroom/, "Pantry"],
+    [/^egg/, "Dairy & eggs"]
+  ];
+  function aisleFor(key, section) {
+    for (var i = 0; i < AISLE_OVERRIDES.length; i++) if (AISLE_OVERRIDES[i][0].test(key)) return AISLE_OVERRIDES[i][1];
+    return section;
+  }
+  var PRICE_INDEX = [];
+  (function () {
+    var section = "Other";
+    PRICES.forEach(function (row) {
+      if (row[0].charAt(0) === "#") { section = row[0].slice(1); return; }
+      var kws = row[0].split("|");
+      var entry = { key: kws[0], price: row[1], aisle: aisleFor(kws[0], section) };
+      kws.forEach(function (kw) {
+        PRICE_INDEX.push({ kw: kw, entry: entry, re: new RegExp("(^|[^a-z])" + escapeRe(kw) + "(?:es|s|ies)?(?![a-z])") });
+      });
+    });
+  })();
+  // The matched record, not just the entry: the keyword that matched is what the
+  // shopping list calls the item, so "gouda" never shows up as "cheddar".
+  function matchIngredient(name) {
+    var best = null;
+    for (var i = 0; i < PRICE_INDEX.length; i++) {
+      var p = PRICE_INDEX[i];
+      if (p.re.test(name) && (!best || p.kw.length > best.kw.length)) best = p;
+    }
+    return best;
+  }
+
+  var FRAC = { "½": 0.5, "⅓": 1 / 3, "⅔": 2 / 3, "¼": 0.25, "¾": 0.75, "⅛": 0.125, "⅜": 0.375, "⅝": 0.625, "⅞": 0.875 };
+  var NUM_RE = "(\\d+\\s+\\d+/\\d+|\\d+/\\d+|\\d*\\.\\d+|\\d+\\s*[½⅓⅔¼¾⅛⅜⅝⅞]|\\d+|[½⅓⅔¼¾⅛⅜⅝⅞])";
+  function num(s) {
+    s = String(s).trim(); var m;
+    if ((m = /^(\d+)\s*([½⅓⅔¼¾⅛⅜⅝⅞])$/.exec(s))) return +m[1] + FRAC[m[2]];
+    if (FRAC[s] != null) return FRAC[s];
+    if ((m = /^(\d+)\s+(\d+)\/(\d+)$/.exec(s))) return +m[1] + m[2] / m[3];
+    if ((m = /^(\d+)\/(\d+)$/.exec(s))) return m[1] / m[2];
+    return parseFloat(s);
+  }
+  // unit -> [dimension, amount in the base unit]; bases are pound, cup, item, package
+  var UNITS = {
+    tsp: ["v", 1 / 48], teaspoon: ["v", 1 / 48], tbsp: ["v", 1 / 16], tbs: ["v", 1 / 16], tablespoon: ["v", 1 / 16],
+    cup: ["v", 1], pint: ["v", 2], quart: ["v", 4], gallon: ["v", 16], "fl oz": ["v", 1 / 8],
+    ml: ["v", 1 / 236.6], milliliter: ["v", 1 / 236.6], millilitre: ["v", 1 / 236.6], l: ["v", 4.227], liter: ["v", 4.227], litre: ["v", 4.227],
+    handful: ["v", 0.5], pinch: ["v", 1 / 96], dash: ["v", 1 / 96], splash: ["v", 1 / 16], stick: ["v", 0.5],
+    g: ["w", 1 / 453.6], gram: ["w", 1 / 453.6], kg: ["w", 2.2046], kilogram: ["w", 2.2046],
+    oz: ["w", 1 / 16], ounce: ["w", 1 / 16], lb: ["w", 1], lbs: ["w", 1], pound: ["w", 1],
+    clove: ["each", 1], slice: ["each", 1], piece: ["each", 1], ear: ["each", 1], fillet: ["each", 1], filet: ["each", 1], strip: ["each", 1],
+    stalk: ["each", 1], rib: ["each", 1], sprig: ["each", 1], leaf: ["each", 1], leaves: ["each", 1], large: ["each", 1], medium: ["each", 1], small: ["each", 1], whole: ["each", 1],
+    can: ["pack", 1], tin: ["pack", 1], jar: ["pack", 1], bottle: ["pack", 1], package: ["pack", 1], pkg: ["pack", 1], packet: ["pack", 1],
+    bag: ["pack", 1], box: ["pack", 1], bunch: ["pack", 1], head: ["pack", 1], carton: ["pack", 1], container: ["pack", 1], block: ["pack", 1], tub: ["pack", 1], loaf: ["pack", 1]
+  };
+  var UNIT_RE = "(fl\\.?\\s?oz|fluid\\s+ounce|" + Object.keys(UNITS).filter(function (k) { return k !== "fl oz"; })
+    .sort(function (a, b) { return b.length - a.length; }).map(escapeRe).join("|") + ")(?:es|s)?\\.?(?![a-z])";
+  var LINE_RE = new RegExp("^\\s*" + NUM_RE + "(?:\\s*(?:-|–|to)\\s*" + NUM_RE + ")?\\s*(?:x\\s*)?(?:\\(([^)]*)\\))?\\s*(?:" + UNIT_RE + ")?\\s*(?:of\\s+)?(.*)$", "i");
+  var ALT_RE = new RegExp("^(?:/|or|\\|)\\s*" + NUM_RE + "\\s*(?:" + UNIT_RE + ")?\\s*", "i");
+  var PACK_RE = new RegExp("^\\s*" + NUM_RE + "\\s*(?:" + UNIT_RE + ")", "i");
+  var DESCRIPTORS = /\b(fresh|freshly|chopped|diced|minced|sliced|grated|shredded|crushed|large|medium|small|boneless|skinless|optional|thinly|thickly|finely|roughly|coarsely|peeled|cubed|softened|melted|cold|warm|hot|cooked|uncooked|raw|ripe|halved|quartered|trimmed|rinsed|drained|packed|heaping|heaped|level|extra|plus more|to taste|for garnish|for serving|about|approximately|approx|lightly|beaten|room temperature|low sodium|reduced sodium|salt reduced|preferably|good quality|of choice|your choice|or more|as needed|divided|torn|cut into[^,]*|juice of|juiced|zested|deveined|deboned|pitted|seeded|stemmed|cored|husked|shelled|thawed)\b/g;
+  function normUnit(u) {
+    if (!u) return null;
+    u = u.toLowerCase().replace(/\.$/, "");
+    if (/^fl/.test(u)) return "fl oz";
+    if (UNITS[u]) return u;
+    if (/(?:es|s)$/.test(u)) { var s1 = u.replace(/es$/, ""), s2 = u.replace(/s$/, ""); if (UNITS[s1]) return s1; if (UNITS[s2]) return s2; }
+    return null;
+  }
+  function cleanName(s) {
+    var segs = String(s || "").toLowerCase().replace(/\([^)]*\)/g, " ").split(",").map(function (seg) {
+      return seg.replace(DESCRIPTORS, " ").replace(/[^a-z'&\- ]+/g, " ").replace(/\s+/g, " ").trim();
+    }).filter(Boolean);
+    return segs[0] || "";
+  }
+  function parseIngredient(line) {
+    var s = String(line).replace(/\s+/g, " ").trim();
+    var out = { qty: null, dim: null, amount: null, pack: null, name: s };
+    var m = LINE_RE.exec(s);
+    if (m && m[1] != null) {
+      var q = num(m[1]); if (m[2]) q = (q + num(m[2])) / 2;
+      var unit = normUnit(m[4]), rest = (m[5] || "").replace(ALT_RE, "");
+      if (m[3]) { var pm = PACK_RE.exec(m[3]); var pu = pm && normUnit(pm[2]); if (pu) out.pack = { dim: UNITS[pu][0], amount: num(pm[1]) * UNITS[pu][1] }; }
+      out.qty = q; out.name = rest;
+      if (unit) { out.dim = UNITS[unit][0]; out.amount = q * UNITS[unit][1]; } else { out.dim = "each"; out.amount = q; }
+    }
+    out.name = cleanName(out.name);
+    return out;
+  }
+  // How to price a quantity of one dimension when the table only knows another (rough conversions).
+  var ROUTES = { w: [["lb", 1], ["cup", 2], ["each", 3], ["pack", 1]], v: [["cup", 1], ["lb", 0.5], ["each", 1], ["pack", 0.5]],
+    each: [["each", 1], ["lb", 0.4], ["cup", 1], ["pack", 0.25]], pack: [["pack", 1], ["lb", 1], ["cup", 2], ["each", 6]] };
+  function estimateCost(price, p) {
+    var q = p.amount == null ? 1 : p.amount, d = p.dim || "each";
+    if (d === "pack" && p.pack && price.pack == null) { var inner = estimateCost(price, { dim: p.pack.dim, amount: p.pack.amount * q }); if (inner != null) return inner; }
+    var routes = ROUTES[d];
+    for (var i = 0; i < routes.length; i++) { var k = routes[i][0]; if (price[k] != null) return q * routes[i][1] * price[k]; }
+    return null;
+  }
+  function trimNum(n) { return String(Math.round(n * 100) / 100); }
+  function fmtFrac(n) {
+    var whole = Math.floor(n + 1e-9), eighths = Math.round((n - whole) * 8);
+    if (eighths === 8) { whole++; eighths = 0; }
+    var f = ["", "1/8", "1/4", "3/8", "1/2", "5/8", "3/4", "7/8"][eighths];
+    return whole ? whole + (f ? " " + f : "") : (f || "0");
+  }
+  function fmtQty(dim, amt) {
+    if (dim === "w") return amt >= 1 ? trimNum(amt) + " lb" : Math.max(1, Math.round(amt * 16)) + " oz";
+    if (dim === "v") {
+      if (amt >= 0.25) return fmtFrac(amt) + (amt > 1 ? " cups" : " cup");
+      if (amt * 16 >= 1) return trimNum(amt * 16) + " tbsp";
+      return Math.max(1, Math.round(amt * 48)) + " tsp";
+    }
+    if (dim === "pack") return trimNum(amt) + " pkg";
+    return trimNum(amt) + " \u00d7";
+  }
+  // Several lines of the same ingredient, added up: "2 lb", "1 1/2 cups", "3 ×".
+  function describeQty(parts) {
+    var sums = {}, any = false;
+    parts.forEach(function (p) { if (p.amount == null) return; sums[p.dim] = (sums[p.dim] || 0) + p.amount; any = true; });
+    if (!any) return "";
+    return ["w", "v", "each", "pack"].filter(function (d) { return sums[d]; })
+      .map(function (d) { return fmtQty(d, sums[d]); }).join(" + ");
+  }
+  // Every planned recipe's ingredients, merged into one row per thing to buy.
+  // Two entries only merge when they came from the same price-table entry AND
+  // end in the same word, so "onion" joins "yellow onion" but not "green onion".
+  function groupIngredients(recipes, slugs) {
+    var groups = [], byKey = {};
+    recipes.forEach(function (r, idx) {
+      ((r && r.ingredients) || []).forEach(function (line) {
+        var p = parseIngredient(line), m = matchIngredient(p.name);
+        var kw = m ? m.kw : (p.name || String(line).toLowerCase());
+        var gkey = (m ? m.entry.key : "?") + "|" + kw.split(" ").pop();
+        var g = byKey[gkey];
+        if (!g) { g = byKey[gkey] = { label: kw, aisle: m ? m.entry.aisle : "Other", parts: [], lines: [], recipes: [] }; groups.push(g); }
+        if (kw.length < g.label.length) g.label = kw;   // "onion", not "yellow onion", once they merge
+        g.parts.push(p); g.lines.push(line);
+        if (g.recipes.indexOf(slugs[idx]) < 0) g.recipes.push(slugs[idx]);
+      });
+    });
+    groups.forEach(function (g) {
+      var total = 0, unknown = 0, set = false, allPantry = true;
+      g.lines.forEach(function (line) {
+        var pl = priceLine(line);
+        g.priceKey = pl.key;
+        if (pl.kind === "set") set = true;
+        if (pl.kind !== "pantry") allPantry = false;
+        if (pl.price == null) unknown++; else total += pl.price;
+      });
+      g.price = total; g.unknown = unknown; g.set = set; g.staple = allPantry && !set;
+      g.qty = describeQty(g.parts);
+      g.text = g.qty ? g.qty + " " + g.label : g.label;
+    });
+    return groups;
+  }
+
+  var repoPrices = {}, localPrices = load(PRICE_KEY, {}), pendingPrices = {}, priceTimer = null;
+  if (typeof localPrices !== "object" || Array.isArray(localPrices)) localPrices = {};
+  function overrides() { return Object.assign({}, repoPrices, localPrices); }
+  function loadPrices() {
+    return readJSON("prices.json").then(function (p) { repoPrices = (p && typeof p === "object" && !Array.isArray(p)) ? p : {}; })
+      .catch(function () { repoPrices = {}; });
+  }
+  // Priced line: {key, price, kind: "est" | "set" | "pantry" | "unknown"}
+  function priceLine(line) {
+    var p = parseIngredient(line), m = matchIngredient(p.name), entry = m ? m.entry : null;
+    var key = entry ? entry.key : (p.name || line.toLowerCase());
+    var ov = overrides()[key];
+    if (typeof ov === "number") return { key: key, price: ov, kind: "set" };
+    if (!entry) return { key: key, price: null, kind: "unknown" };
+    var est = estimateCost(entry.price, p);
+    if (est == null) return { key: key, price: null, kind: "unknown" };
+    if (entry.price.pantry && (p.dim == null || est < 0.5)) return { key: key, price: 0, kind: "pantry" };
+    return { key: key, price: Math.max(0.05, Math.round(est * 20) / 20), kind: "est" };
+  }
+  function setPrice(key, value) {   // number, or null to go back to the estimate
+    if (unlocked()) {
+      pendingPrices[key] = value;
+      if (value == null) delete repoPrices[key]; else repoPrices[key] = value;
+      delete localPrices[key]; store(PRICE_KEY, localPrices);
+      clearTimeout(priceTimer);
+      priceTimer = setTimeout(flushPrices, 1200);
+    } else {
+      if (value == null) delete localPrices[key]; else localPrices[key] = value;
+      store(PRICE_KEY, localPrices);
+    }
+  }
+  function flushPrices() {
+    var batch = pendingPrices; pendingPrices = {};
+    var keys = Object.keys(batch); if (!keys.length) return;
+    readJSON("prices.json").catch(function () { return {}; }).then(function (fresh) {
+      fresh = (fresh && typeof fresh === "object" && !Array.isArray(fresh)) ? fresh : {};
+      keys.forEach(function (k) { if (batch[k] == null) delete fresh[k]; else fresh[k] = batch[k]; });
+      return commit("Cookbook: price for " + keys.join(", "), [{ path: "prices.json", content: pretty(fresh) }]).then(function () { repoPrices = fresh; });
+    }).catch(function (e) {
+      keys.forEach(function (k) { if (batch[k] != null) localPrices[k] = batch[k]; }); store(PRICE_KEY, localPrices);
+      showBanner("Couldn't save that price to the cookbook (" + e.message + "). It's kept on this device.");
+    });
+  }
+  function recipeCost(r) {
+    var total = 0, unknown = 0;
+    (r.ingredients || []).forEach(function (line) { var pl = priceLine(line); if (pl.price == null) unknown++; else total += pl.price; });
+    return { total: total, unknown: unknown };
+  }
+
+  // ---------- the shared plan ----------
+  // The week's meals, the checked-off shopping items and any extra items live in
+  // plan.json in the data repo, so both phones see the same list. Anyone with the
+  // link can read it; only an unlocked device writes. A locked device keeps its
+  // own copy in this browser instead.
+  var PLAN_FILE = "plan.json";
+  var shared = { days: null, checked: {}, extras: [], updatedAt: null };
+  var sharedLoaded = false, planTimer = null, planSaving = false;
+  var checkDelta = {}, extraDelta = {};
+  function plainObject(v) { return v && typeof v === "object" && !Array.isArray(v) ? v : {}; }
+  function readPlanDoc(doc) {
+    return { days: Array.isArray(doc.days) ? doc.days : null, checked: plainObject(doc.checked),
+      extras: Array.isArray(doc.extras) ? doc.extras.filter(function (x) { return x && x.id && x.text; }) : [],
+      updatedAt: typeof doc.updatedAt === "string" ? doc.updatedAt : null };
+  }
+  function loadSharedPlan() {
+    return readJSON(PLAN_FILE).then(function (d) {
+      shared = readPlanDoc(plainObject(d)); sharedLoaded = true;
+    }).catch(function () {
+      shared = { days: null, checked: {}, extras: [], updatedAt: null }; sharedLoaded = false;
+    });
+  }
+  function queuePlanSave() {
+    if (!unlocked()) return;   // locked: it's already in localStorage, nothing to push
+    planSaving = true;
+    clearTimeout(planTimer);
+    planTimer = setTimeout(flushPlan, 1200);
+  }
+  // Re-read before writing and replay only what changed here, so one of us
+  // checking things off in the store doesn't wipe the other's edits.
+  function flushPlan() {
+    var days = shared.days, cd = checkDelta, ed = extraDelta;
+    checkDelta = {}; extraDelta = {};
+    readJSON(PLAN_FILE).catch(function () { return {}; }).then(function (raw) {
+      var fresh = readPlanDoc(plainObject(raw));
+      Object.keys(cd).forEach(function (k) { if (cd[k]) fresh.checked[k] = 1; else delete fresh.checked[k]; });
+      Object.keys(ed).forEach(function (id) {
+        fresh.extras = fresh.extras.filter(function (x) { return x.id !== id; });
+        if (ed[id]) fresh.extras.push(ed[id]);
+      });
+      var doc = { days: days, checked: fresh.checked, extras: fresh.extras, updatedAt: nowISO() };
+      return commit("Cookbook: update the week", [{ path: PLAN_FILE, content: pretty(doc) }]).then(function () {
+        shared.checked = doc.checked; shared.extras = doc.extras; shared.updatedAt = doc.updatedAt;
+        sharedLoaded = true;
+      });
+    }).catch(function (e) {
+      showBanner("Couldn't save the week to the cookbook (" + e.message + "). It's kept on this device for now.");
+    }).then(function () { planSaving = false; });
+  }
+  // Someone else may have changed the plan while this tab sat in the background.
+  document.addEventListener("visibilitychange", function () {
+    if (document.hidden || planSaving || !/^#week(=|$)/.test(location.hash)) return;
+    var was = shared.updatedAt;
+    readJSON(PLAN_FILE).then(function (raw) {
+      var fresh = readPlanDoc(plainObject(raw));
+      if (!fresh.updatedAt || fresh.updatedAt === was) return;
+      shared = fresh; sharedLoaded = true;
+      route();
+    }).catch(function () {});
+  });
+
+  // ---------- lock state ----------
+  var lockBtn = document.getElementById("lockBtn"), addLocked = document.getElementById("addLocked"), addForm = document.getElementById("addForm");
+  var dlg = document.getElementById("unlockDlg"), tokenInput = document.getElementById("tokenInput"), unlockErr = document.getElementById("unlockErr");
+  function renderLock() {
+    var on = unlocked();
+    lockBtn.textContent = on ? "🔓 Editing on" : "🔒 Unlock editing";
+    addLocked.hidden = on; addForm.hidden = !on;
+    showBanner(token() && tokenBad ? "GitHub rejected the saved access token; it may have expired. Unlock again with a fresh one." : "");
+  }
+  function openUnlock() { unlockErr.hidden = true; tokenInput.value = ""; dlg.showModal(); tokenInput.focus(); }
+  lockBtn.addEventListener("click", function () {
+    if (unlocked()) {
+      if (confirm("Forget the access token on this device? You can paste it again any time.")) { try { localStorage.removeItem(TOKEN_KEY); } catch (e) {} tokenBad = false; renderLock(); route(); }
+    } else openUnlock();
+  });
+  document.getElementById("unlockBtn").addEventListener("click", openUnlock);
+  document.getElementById("unlockCancel").addEventListener("click", function () { dlg.close(); });
+  document.getElementById("unlockForm").addEventListener("submit", function (ev) {
+    ev.preventDefault();
+    var t = tokenInput.value.trim(), go = document.getElementById("unlockGo");
+    if (!t) return;
+    go.disabled = true; unlockErr.hidden = true;
+    fetch(API, { headers: { Authorization: "Bearer " + t, Accept: "application/vnd.github+json", "X-GitHub-Api-Version": "2022-11-28" }, cache: "no-store" })
+      .then(function (r) { if (r.status === 401) throw new Error("GitHub rejected that token."); if (!r.ok) throw new Error("GitHub answered HTTP " + r.status + "."); return r.json(); })
+      .then(function (info) {
+        if (!info.permissions || !info.permissions.push) throw new Error("That token can't write to the cookbook. It needs Contents: read and write on " + OWNER + "/" + REPO + ".");
+        try { localStorage.setItem(TOKEN_KEY, t); } catch (e) { throw new Error("This browser won't store the token (private mode?)."); }
+        tokenBad = false; indexCache = null; recipeCache = {};
+        dlg.close(); renderLock();
+        loadSharedPlan().then(route, route);
+      })
+      .catch(function (e) { unlockErr.textContent = e.message; unlockErr.hidden = false; })
+      .then(function () { go.disabled = false; });
+  });
+
+  // ---------- list ----------
+  function showList() {
+    document.title = "Cookbook";
+    loadIndex().then(function (items) {
+      if (!items.length) {
+        status(unlocked() ? "No recipes yet. Paste a link above, or write your own." : "No recipes yet.");
+        return;
+      }
+      var grid = el("div", { class: "cards" });
+      items.forEach(function (r) {
+        var thumb = el("div", { class: "thumb" }, [image(r.image, "", "") || "🍽️"]);
+        var t = r.totalTime || (minutes(r.prepTime) != null && minutes(r.cookTime) != null ? fmtMin(minutes(r.prepTime) + minutes(r.cookTime)) : null);
+        var meta = [r.site || "your own", t].filter(Boolean).join(" · ");
+        grid.appendChild(el("a", { class: "card", href: "#" + encodeURIComponent(r.slug) }, [
+          thumb, el("div", { class: "body" }, [el("h3", { text: r.name || r.slug }), el("p", { class: "meta", text: meta })])
+        ]));
+      });
+      view.replaceChildren(grid);
+    }).catch(function (e) { status(loadError(e), true); });
+  }
+
+  // ---------- one recipe ----------
+  function timeSpan(label, text, mins, estimated) {
+    if (text) return el("span", {}, [label + " ", el("b", { text: text })]);
+    return el("span", {}, [label + " ", el("b", { class: "est", text: "~" + fmtMin(mins), title: "Estimated from the number of ingredients and steps" })]);
+  }
+  function showRecipe(slug) {
+    status("Loading…");
+    loadRecipe(slug).then(function (r) {
+      document.title = (r.name || "Recipe") + " · Cookbook";
+      var t = timeInfo(r);
+      var meta = el("p", { class: "meta" });
+      if (r.source) {
+        var host = r.site || (function () { try { return new URL(r.source).hostname; } catch (e) { return "source"; } })();
+        meta.appendChild(el("span", {}, ["From ", el("a", { href: r.source, target: "_blank", rel: "noopener", text: host })]));
+      }
+      if (r.author) meta.appendChild(el("span", { text: "by " + r.author }));
+      meta.appendChild(timeSpan("Prep", r.prepTime, t.prep));
+      meta.appendChild(timeSpan("Cook", r.cookTime, t.cook));
+      meta.appendChild(timeSpan("Total", r.totalTime, t.total));
+      if (r.yield) meta.appendChild(el("span", {}, ["Makes ", el("b", { text: r.yield })]));
+      var cost = recipeCost(r);
+      meta.appendChild(el("span", { title: "Rough grocery estimate for everything in the ingredient list" }, ["Groceries ", el("b", { class: "est", text: "~" + money(cost.total) + (cost.unknown ? " + " + cost.unknown + " unpriced" : "") })]));
+
+      var ingredients = el("div", { class: "panel ingredients" }, [el("h3", { text: "Ingredients" })]);
+      if (r.ingredients && r.ingredients.length) {
+        ingredients.appendChild(el("ul", {}, r.ingredients.map(function (i) { return el("li", { text: i }); })));
+      } else {
+        ingredients.appendChild(el("p", { class: "meta", text: "No ingredient list." }));
+      }
+      var steps = el("div", { class: "panel steps" }, [el("h3", { text: "Steps" })]);
+      var sections = r.instructions || [];
+      if (!sections.length) steps.appendChild(el("p", { class: "meta", text: r.source ? "No steps were found on the page — use the source link." : "No steps yet." }));
+      sections.forEach(function (s) {
+        if (s.name && sections.length > 1) steps.appendChild(el("h4", { text: s.name }));
+        steps.appendChild(el("ol", {}, (s.steps || []).map(function (st) { return el("li", { text: st }); })));
+      });
+
+      var actions = null;
+      if (unlocked()) {
+        var del = el("button", { class: "btn danger", type: "button", text: "Delete" });
+        del.addEventListener("click", function () {
+          if (!confirm("Delete “" + (r.name || r.slug) + "” from the cookbook? This can't be undone.")) return;
+          del.disabled = true; del.textContent = "Deleting…";
+          deleteRecipe(r).then(function () { location.hash = ""; })
+            .catch(function (e) { del.disabled = false; del.textContent = "Delete"; alert("Couldn't delete: " + e.message); });
+        });
+        actions = el("div", { class: "actions" }, [el("a", { class: "btn", href: "#edit=" + encodeURIComponent(r.slug), text: "✎ Edit" }), del]);
+      }
+
+      view.replaceChildren(el("article", { class: "recipe" }, [
+        el("div", { class: "topline" }, [el("a", { class: "backlink", href: "#", text: "← All recipes" }), actions]),
+        el("h2", { text: r.name || slug }),
+        meta,
+        image(r.image, r.name, "hero"),
+        r.description ? el("p", { class: "desc", text: r.description }) : null,
+        el("div", { class: "cols sticky" }, [ingredients, steps])
+      ]));
+      window.scrollTo(0, 0);
+    }).catch(function (e) {
+      status(e.status === 404 ? "That recipe isn't in the cookbook (any more)." : "Couldn't load that recipe (" + e.message + ").", true, el("a", { class: "btn", href: "#", text: "All recipes" }));
+    });
+  }
+
+  // ---------- add / edit ----------
+  function lines(text) { return String(text || "").split(/\r?\n/).map(function (l) { return l.trim().replace(/^[-•*]\s+/, ""); }).filter(Boolean); }
+  function parseSteps(text) {
+    var sections = [], cur = null;
+    String(text || "").split(/\r?\n/).forEach(function (line) {
+      line = line.trim(); if (!line) return;
+      if (/^#/.test(line)) { cur = { name: line.replace(/^#+\s*/, "").replace(/:$/, "") || null, steps: [] }; sections.push(cur); return; }
+      line = line.replace(/^(?:\d+[.)]|[-•*])\s+/, "");
+      if (!cur) { cur = { name: null, steps: [] }; sections.push(cur); }
+      cur.steps.push(line);
+    });
+    return sections.filter(function (s) { return s.steps.length; });
+  }
+  function stepsText(sections) {
+    return (sections || []).map(function (s) { return (s.name ? "# " + s.name + "\n" : "") + (s.steps || []).join("\n"); }).join("\n\n");
+  }
+  function uniqueSlug(base, index) {
+    var taken = {}; index.forEach(function (r) { taken[r.slug] = true; });
+    var slug = base, n = 2;
+    while (taken[slug]) slug = base + "-" + (n++);
+    return slug;
+  }
+  function field(label, name, value, opts) {
+    opts = opts || {};
+    var input = opts.textarea
+      ? el("textarea", { name: name, rows: opts.rows || 6, placeholder: opts.placeholder || null })
+      : el("input", { name: name, type: opts.type || "text", placeholder: opts.placeholder || null, required: opts.required ? "" : null, inputmode: opts.inputmode || null });
+    input.value = value || "";
+    return el("label", {}, [label, input]);
+  }
+  function showEditor(slug) {
+    document.title = (slug ? "Edit recipe" : "New recipe") + " · Cookbook";
+    if (!unlocked()) {
+      var b = el("button", { class: "btn primary", type: "button", text: "Unlock editing" }); b.addEventListener("click", openUnlock);
+      status("Unlock editing to add or change recipes.", false, b);
+      return;
+    }
+    status("Loading…");
+    Promise.all([loadIndex(), slug ? loadRecipe(slug) : null]).then(function (res) {
+      var index = res[0], existing = res[1];
+      var form = el("form", { class: "panel editor" });
+      var err = el("p", { class: "err", hidden: "" });
+      var save = el("button", { class: "btn primary", type: "submit", text: existing ? "Save changes" : "Add to cookbook" });
+      form.append(
+        el("h2", { text: existing ? "Edit “" + (existing.name || existing.slug) + "”" : "Write your own recipe" }),
+        field("Name", "name", existing && existing.name, { required: true, placeholder: "Tuesday tacos" }),
+        el("div", { class: "grid" }, [
+          field("Prep time", "prep", existing && existing.prepTime, { placeholder: "15 min" }),
+          field("Cook time", "cook", existing && existing.cookTime, { placeholder: "30 min" }),
+          field("Makes", "yield", existing && existing.yield, { placeholder: "4 servings" })
+        ]),
+        field("Ingredients, one per line", "ingredients", (existing && existing.ingredients || []).join("\n"), { textarea: true, rows: 10, placeholder: "1 lb ground beef\n1 onion, diced\n2 cloves garlic" }),
+        el("p", { class: "note", text: "Start lines with an amount (1 lb, 2 cups, 3) and the grocery estimate can price them." }),
+        field("Steps, one per line", "steps", stepsText(existing && existing.instructions), { textarea: true, rows: 12, placeholder: "Brown the beef.\nAdd the onion and garlic.\n\n# For the sauce\nStir everything together." }),
+        el("p", { class: "note", text: "A line starting with # names a section, like “# For the sauce”." }),
+        el("div", { class: "grid" }, [
+          field("Link to the original (optional)", "source", existing && existing.source, { type: "url", placeholder: "https://…" }),
+          field("Photo link (optional)", "image", existing && existing.image, { type: "url", placeholder: "https://…" })
+        ]),
+        field("Notes (optional)", "notes", existing && existing.description, { textarea: true, rows: 3 }),
+        err,
+        el("div", { class: "actions" }, [save, el("a", { class: "btn", href: existing ? "#" + encodeURIComponent(existing.slug) : "#", text: "Cancel" })])
+      );
+      form.addEventListener("submit", function (ev) {
+        ev.preventDefault();
+        var f = form.elements, name = f.name.value.trim();
+        if (!name) { f.name.focus(); return; }
+        var prep = f.prep.value.trim(), cook = f.cook.value.trim(), pm = minutes(prep), cm = minutes(cook);
+        var source = f.source.value.trim() || null, site = null;
+        if (source) { try { site = new URL(source).hostname.replace(/^www\./, ""); } catch (e) { site = null; } }
+        var keepTotal = existing && prep === (existing.prepTime || "") && cook === (existing.cookTime || "");
+        var recipe = {
+          slug: existing ? existing.slug : uniqueSlug(slugify(name), index),
+          name: name,
+          source: source,
+          site: site,
+          author: existing ? existing.author || null : null,
+          image: f.image.value.trim() || null,
+          description: f.notes.value.trim() || null,
+          yield: f.yield.value.trim() || null,
+          prepTime: pm != null ? fmtMin(pm) : (prep || null),
+          cookTime: cm != null ? fmtMin(cm) : (cook || null),
+          totalTime: keepTotal ? existing.totalTime || null : (pm != null && cm != null ? fmtMin(pm + cm) : null),
+          ingredients: lines(f.ingredients.value),
+          instructions: parseSteps(f.steps.value),
+          savedAt: existing && existing.savedAt ? existing.savedAt : nowISO()
+        };
+        if (existing) recipe.updatedAt = nowISO();
+        save.disabled = true; save.textContent = "Saving…"; err.hidden = true;
+        saveRecipe(recipe, existing ? "edit" : "add").then(function () {
+          location.hash = "#" + encodeURIComponent(recipe.slug);
+        }).catch(function (e) {
+          save.disabled = false; save.textContent = existing ? "Save changes" : "Add to cookbook";
+          err.textContent = "Couldn't save (" + e.message + "). Your text is still here; try again."; err.hidden = false;
+        });
+      });
+      view.replaceChildren(form);
+      window.scrollTo(0, 0);
+      if (!existing) form.elements.name.focus();
+    }).catch(function (e) { status(loadError(e), true); });
+  }
+
+  // ---------- week planner + shopping list ----------
+  // A plan is 7 days, each a list of meals with dinner first. It lives in
+  // plan.json (see above) and can also be handed to someone as a link:
+  // #week=<mon>,<tue>,… where a day is its meals joined by "+", a bare slug is
+  // dinner and "b:"/"l:"/"s:" prefix breakfast, lunch and dessert.
+  var DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+  var KINDS = { dinner: "Dinner", breakfast: "Breakfast", lunch: "Lunch", dessert: "Dessert" };
+  var EXTRA_KINDS = ["breakfast", "lunch", "dessert"];
+  var KIND_CODE = { breakfast: "b", lunch: "l", dessert: "s" }, CODE_KIND = { b: "breakfast", l: "lunch", s: "dessert" };
+  // Empty slots are "" (not null) so JSON and UI never show the word "null".
+  function validSlug(s) {
+    if (typeof s !== "string") return "";
+    s = s.trim();
+    if (!s || s === "null" || s === "undefined" || s === "none") return "";
+    return /^[a-z0-9-]+$/.test(s) ? s : "";
+  }
+  // Old plans were 7 slugs (dinner only); new ones are 7 lists of {kind, slug}.
+  function normalizePlan(raw) {
+    var days = [];
+    for (var i = 0; i < 7; i++) {
+      var d = raw && raw[i], meals = [];
+      if (Array.isArray(d)) d.forEach(function (m) { if (m && KINDS[m.kind]) meals.push({ kind: m.kind, slug: validSlug(m.slug) }); });
+      else meals.push({ kind: "dinner", slug: validSlug(d) });
+      var dinner = meals.filter(function (m) { return m.kind === "dinner"; })[0] || { kind: "dinner", slug: "" };
+      days.push([dinner].concat(meals.filter(function (m) { return m.kind !== "dinner"; })));
+    }
+    return days;
+  }
+  function planFromHash(hash) {
+    var m = /^#week=(.*)$/.exec(hash);
+    if (!m) return null;
+    return normalizePlan(m[1].split(",").map(function (day) {
+      var meals = [];
+      day.split("+").forEach(function (item, i) {
+        var k = /^([a-z]):(.*)$/.exec(item);
+        if (k) { if (CODE_KIND[k[1]]) meals.push({ kind: CODE_KIND[k[1]], slug: k[2] }); }
+        else if (i === 0) meals.push({ kind: "dinner", slug: item });
+      });
+      return meals;
+    }));
+  }
+  function encodePlan(plan) {
+    return plan.map(function (day) {
+      return day.map(function (m) { return m.kind === "dinner" ? str(m.slug) : KIND_CODE[m.kind] + ":" + str(m.slug); }).join("+");
+    }).join(",");
+  }
+  function unique(v, i, arr) { return arr.indexOf(v) === i; }
+
+  function showWeek() {
+    document.title = "This week · Cookbook";
+    loadIndex().then(function (recipes) {
+      var known = {};
+      recipes.forEach(function (r) { known[r.slug] = r; });
+      var byName = recipes.slice().sort(function (a, b) { return String(a.name || a.slug).localeCompare(String(b.name || b.slug)); });
+
+      // A link that carries a plan wins, and becomes the plan from here on.
+      var linked = planFromHash(location.hash);
+      var plan = normalizePlan(linked || shared.days || load(PLAN_KEY, []));
+      var scrubbed = false;
+      plan.forEach(function (day) {
+        day.forEach(function (m) {
+          if (m.slug && !known[m.slug]) { m.slug = ""; scrubbed = true; }
+          if (m.slug == null) { m.slug = ""; scrubbed = true; }
+        });
+      });
+      var checked = sharedLoaded ? shared.checked : plainObject(load(CHECK_KEY, {}));
+      var extras = sharedLoaded ? shared.extras : (load(EXTRA_KEY, []) || []).filter(function (x) { return x && x.id && x.text; });
+      var adding = {}, focusDay = -1;
+
+      function allSlugs() {
+        var out = [];
+        plan.forEach(function (day) { day.forEach(function (m) { if (m.slug) out.push(m.slug); }); });
+        return out;
+      }
+      function savePlan() {
+        shared.days = plan; store(PLAN_KEY, plan); queuePlanSave();
+      }
+      if (scrubbed) savePlan();
+      function setChecked(key, on) {
+        if (on) checked[key] = 1; else delete checked[key];
+        shared.checked = checked; store(CHECK_KEY, checked);
+        checkDelta[key] = on ? 1 : 0; queuePlanSave();
+      }
+      function saveExtras() { shared.extras = extras; store(EXTRA_KEY, extras); queuePlanSave(); }
+      function pick(exclude, allowRepeat) {
+        var pool = recipes.filter(function (r) { return exclude.indexOf(r.slug) < 0; });
+        if (!pool.length && allowRepeat) pool = recipes;
+        return pool.length ? pool[Math.floor(Math.random() * pool.length)].slug : "";
+      }
+      if (linked) { history.replaceState(null, "", location.pathname + location.search + "#week"); savePlan(); }
+
+      function render() {
+        // Fills the nights you haven't chosen yourself and leaves the rest alone.
+        var suggest = el("button", { class: "btn primary", type: "button", text: "🎲 Suggest a week" });
+        suggest.addEventListener("click", function () {
+          plan.forEach(function (day) { if (!day[0].slug) day[0].slug = pick(allSlugs(), false); });
+          savePlan(); render();
+        });
+        var clear = el("button", { class: "btn", type: "button", text: "Clear week" });
+        clear.addEventListener("click", function () { plan = normalizePlan([]); savePlan(); render(); });
+        var copy = el("button", { class: "btn", type: "button", text: "🔗 Copy link" });
+        copy.addEventListener("click", function () {
+          var url = location.origin + location.pathname + "#week=" + encodePlan(plan);
+          function done() { copy.textContent = "✓ Copied"; setTimeout(function () { copy.textContent = "🔗 Copy link"; }, 1600); }
+          if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(url).then(done, function () { prompt("Copy this link:", url); });
+          else prompt("Copy this link:", url);
+        });
+
+        var week = el("div", { class: "week" }), slotMeta = {};
+        plan.forEach(function (day, i) {
+          var meals = el("div", { class: "meals" });
+          day.forEach(function (m, j) {
+            var kindName = KINDS[m.kind];
+            var select = el("select", { "aria-label": DAYS[i] + " " + kindName.toLowerCase() });
+            var blank = el("option", { value: "", text: m.kind === "dinner" ? "— nothing planned —" : "— pick a recipe —" });
+            if (!m.slug) blank.selected = true;
+            select.appendChild(blank);
+            byName.forEach(function (r) {
+              var opt = el("option", { value: r.slug, text: r.name || r.slug || "Untitled recipe" });
+              if (r.slug === m.slug) opt.selected = true;
+              select.appendChild(opt);
+            });
+            select.addEventListener("change", function () { m.slug = validSlug(select.value); savePlan(); render(); });
+            var swap = el("button", { class: "iconbtn", type: "button", title: "Swap for a different recipe", "aria-label": "Swap " + DAYS[i] + " " + kindName.toLowerCase(), text: "🔀" });
+            swap.addEventListener("click", function () {
+              var other = pick(allSlugs(), true);
+              if (other) m.slug = other;
+              savePlan(); render();
+            });
+            var remove = null;
+            if (m.kind !== "dinner") {
+              remove = el("button", { class: "iconbtn", type: "button", title: "Remove this " + kindName.toLowerCase(), "aria-label": "Remove " + DAYS[i] + " " + kindName.toLowerCase(), text: "×" });
+              remove.addEventListener("click", function () { day.splice(j, 1); savePlan(); render(); });
+            }
+            var meta = m.slug ? el("span", { class: "slotmeta", text: "…" }) : null;
+            if (m.slug) (slotMeta[m.slug] = slotMeta[m.slug] || []).push(meta);
+            meals.appendChild(el("div", { class: "mealrow" + (m.slug ? "" : " blank") }, [
+              el("span", { class: "kind", text: kindName }), select, swap, remove,
+              m.slug ? el("a", { class: "open", href: "#" + encodeURIComponent(m.slug), text: "Open →" }) : null,
+              meta
+            ]));
+          });
+          var addRow = el("div", { class: "addmeal" });
+          if (adding[i]) {
+            EXTRA_KINDS.forEach(function (kind) {
+              var chip = el("button", { class: "chip", type: "button", text: KINDS[kind] });
+              chip.addEventListener("click", function () { adding[i] = false; focusDay = i; day.push({ kind: kind, slug: "" }); savePlan(); render(); });
+              addRow.appendChild(chip);
+            });
+            var cancel = el("button", { class: "chip muted", type: "button", text: "Cancel" });
+            cancel.addEventListener("click", function () { adding[i] = false; render(); });
+            addRow.appendChild(cancel);
+          } else {
+            var plus = el("button", { class: "plus", type: "button", title: "Add breakfast, lunch or dessert to this day", text: "+ Add meal" });
+            plus.addEventListener("click", function () { adding[i] = true; render(); });
+            addRow.appendChild(plus);
+          }
+          meals.appendChild(addRow);
+          week.appendChild(el("div", { class: "slot" }, [el("span", { class: "day", text: DAYS[i] }), meals]));
+        });
+
+        var stats = el("div", { class: "stats" });
+        var nights = plan.filter(function (d) { return d[0].slug; }).length;
+        var extraMeals = allSlugs().length - nights;
+        var extrasNote = extraMeals ? "+ " + extraMeals + " other meal" + (extraMeals === 1 ? "" : "s") : null;
+        function tile(k, v, sub) { return el("div", { class: "stat" }, [el("div", { class: "k", text: k }), el("div", { class: "v", text: v }), sub ? el("div", { class: "s", text: sub }) : null]); }
+        stats.replaceChildren(tile("Groceries", "…"), tile("Kitchen time", "…"), tile("Dinners planned", nights + " of 7", extrasNote));
+
+        var shopping = el("section", { class: "panel shopping" });
+        var uncheck = el("button", { class: "small", type: "button", text: "Uncheck all" });
+        uncheck.addEventListener("click", function () {
+          Object.keys(checked).forEach(function (k) { delete checked[k]; checkDelta[k] = 0; });
+          shared.checked = checked; store(CHECK_KEY, checked); queuePlanSave(); render();
+        });
+        shopping.appendChild(el("h3", {}, ["Shopping list", uncheck]));
+        var holder = el("p", { class: "meta", text: "Loading ingredients…" });
+        shopping.appendChild(holder);
+
+        // One row per thing to buy: check it off, or tap the price to correct it.
+        function itemRow(o) {
+          var box = el("input", { type: "checkbox" });
+          box.checked = !!checked[o.key];
+          var label = el("label", { class: box.checked ? "done" : "" }, [box,
+            el("span", {}, [o.text, o.from ? el("span", { class: "from", text: o.from }) : null])]);
+          box.addEventListener("change", function () { setChecked(o.key, box.checked); label.classList.toggle("done", box.checked); });
+          var price = el("button", { class: "price " + (o.kind === "set" ? "set" : o.kind === "unknown" ? "unknown" : ""), type: "button",
+            text: o.kind === "unknown" ? "$?" : o.kind === "pantry" ? "pantry" : (o.kind === "set" ? "" : "~") + money(o.price),
+            title: o.kind === "unknown" ? "No price guess for this. Tap to set what it costs."
+              : o.kind === "pantry" ? "Counted as $0: something you probably have. Tap to set a price if you need to buy it."
+              : o.kind === "set" ? "Your price for “" + o.priceKey + "”. Tap to change it, or clear it to go back to the estimate."
+              : "Rough estimate for “" + o.priceKey + "”. Tap to set what it costs at your store." });
+          price.addEventListener("click", function () {
+            var cur = o.kind === "set" ? String(o.unit == null ? o.price : o.unit) : "";
+            var q = o.times > 1
+              ? "What does one “" + o.priceKey + "” cost at your store? It's on the list " + o.times + " times. Leave empty to use the estimate."
+              : "What does “" + o.priceKey + "” cost at your store? Leave empty to use the estimate.";
+            var ans = prompt(q, cur);
+            if (ans === null) return;
+            ans = ans.replace(/[$,\s]/g, "");
+            if (ans === "") setPrice(o.priceKey, null);
+            else if (isFinite(+ans) && +ans >= 0) setPrice(o.priceKey, Math.round(+ans * 100) / 100);
+            else return;
+            render();
+          });
+          var kids = [label, price];
+          if (o.onRemove) {
+            var rm = el("button", { class: "remove", type: "button", title: "Remove this item", "aria-label": "Remove " + o.text, text: "×" });
+            rm.addEventListener("click", o.onRemove);
+            kids.push(rm);
+          }
+          return el("li", {}, kids);
+        }
+
+        Promise.all(allSlugs().filter(unique).map(function (s) { return loadRecipe(s).catch(function () { return null; }); })).then(function (full) {
+          var planned = allSlugs().filter(unique);
+          var frag = document.createDocumentFragment();
+          var prepTotal = 0, cookTotal = 0, anyEst = false, missing = 0;
+          full.forEach(function (r, idx) {
+            var cost = r ? recipeCost(r) : { total: 0, unknown: 0 };
+            var t = r ? timeInfo(r) : null;
+            if (t) { prepTotal += t.prep; cookTotal += t.cook; anyEst = anyEst || t.estimated; }
+            if (!r) missing++;
+            (slotMeta[planned[idx]] || []).forEach(function (m) {
+              m.textContent = t ? "⏱ " + (t.estimated ? "~" : "") + fmtMin(t.total) + " (prep " + fmtMin(t.prep) + ", cook " + fmtMin(t.cook) + ") · 🛒 ~" + money(cost.total) : "Couldn't load this recipe.";
+            });
+          });
+
+          var groups = groupIngredients(full.filter(Boolean), planned.filter(function (s, i) { return full[i]; }));
+          var total = 0, unknown = 0;
+          groups.forEach(function (g) { total += g.price; unknown += g.unknown; });
+          var staples = groups.filter(function (g) { return g.staple; });
+          var buy = groups.filter(function (g) { return !g.staple; });
+
+          if (!planned.length) frag.appendChild(el("p", { class: "meta", text: "Plan some meals and their ingredients show up here, merged and grouped by aisle." }));
+          AISLES.forEach(function (aisle) {
+            var rows = buy.filter(function (g) { return g.aisle === aisle; });
+            if (!rows.length) return;
+            frag.appendChild(el("h4", { class: "aisle", text: aisle }));
+            frag.appendChild(el("ul", {}, rows.map(function (g) {
+              return itemRow({ key: g.label, text: g.text, priceKey: g.priceKey, price: g.price, times: g.lines.length,
+                kind: g.unknown === g.lines.length ? "unknown" : g.set ? "set" : "est",
+                from: g.recipes.map(function (s) { return (known[s] && known[s].name) || s; }).join(" · ") });
+            })));
+          });
+          if (staples.length) {
+            var det = el("details");
+            det.appendChild(el("summary", { text: staples.length + " staple" + (staples.length === 1 ? "" : "s") + " you probably already have" }));
+            det.appendChild(el("ul", {}, staples.map(function (g) {
+              return itemRow({ key: g.label, text: g.text, priceKey: g.priceKey, price: g.price, times: g.lines.length, kind: "pantry",
+                from: g.recipes.map(function (s) { return (known[s] && known[s].name) || s; }).join(" · ") });
+            })));
+            frag.appendChild(det);
+          }
+
+          // Milk, paper towels, anything that isn't in a recipe.
+          if (extras.length) {
+            frag.appendChild(el("h4", { class: "aisle", text: "Also on the list" }));
+            frag.appendChild(el("ul", {}, extras.map(function (x) {
+              var pl = priceLine(x.text);
+              if (pl.price != null) { total += pl.price; } else { unknown++; }
+              return itemRow({ key: "extra:" + x.id, text: x.text, priceKey: pl.key, price: pl.price || 0, times: 1,
+                kind: pl.kind === "set" ? "set" : pl.price == null ? "unknown" : pl.kind,
+                onRemove: function () {
+                  extras = extras.filter(function (y) { return y.id !== x.id; });
+                  extraDelta[x.id] = null; saveExtras();
+                  if (checked["extra:" + x.id]) setChecked("extra:" + x.id, false);
+                  render();
+                } });
+            })));
+          }
+          var addForm = el("form", { class: "additem" });
+          var addInput = el("input", { type: "text", placeholder: "Add an item — milk, paper towels…", "aria-label": "Add a shopping item" });
+          addForm.append(addInput, el("button", { class: "btn", type: "submit", text: "Add" }));
+          addForm.addEventListener("submit", function (ev) {
+            ev.preventDefault();
+            var text = addInput.value.trim();
+            if (!text) return;
+            var item = { id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6), text: text };
+            extras.push(item); extraDelta[item.id] = item; saveExtras();
+            render();
+          });
+          frag.appendChild(addForm);
+
+          if (missing) frag.appendChild(el("p", { class: "foot", text: missing + " planned recipe" + (missing === 1 ? "" : "s") + " couldn't be loaded, so nothing from " + (missing === 1 ? "it is" : "them are") + " on this list." }));
+          var unpriced = unknown ? unknown + " item" + (unknown === 1 ? "" : "s") + " not priced" : "";
+          frag.appendChild(el("div", { class: "total" }, [
+            el("span", {}, ["Total for the week", unpriced ? el("span", { class: "n", text: " · " + unpriced }) : null]),
+            el("b", { text: "~" + money(total) })
+          ]));
+          frag.appendChild(el("p", { class: "foot", text: "Same ingredient from two recipes is added up into one line. Prices are rough guesses from typical US supermarket prices — tap any to set your own." }));
+          holder.replaceWith(frag);
+
+          var mealsCount = nights + extraMeals;
+          stats.replaceChildren(
+            tile("Groceries", "~" + money(total), (unpriced ? unpriced + " · " : "") + "~" + money(mealsCount ? total / mealsCount : 0) + (extraMeals ? " a meal" : " a night")),
+            tile("Kitchen time", (anyEst ? "~" : "") + fmtMin(prepTotal + cookTotal), "prep " + fmtMin(prepTotal) + " · cook " + fmtMin(cookTotal)),
+            tile("Dinners planned", nights + " of 7", extrasNote)
+          );
+        });
+
+        view.replaceChildren(
+          el("div", { class: "weekhead" }, [el("h2", { text: "Meals this week" }), el("div", { class: "actions" }, [suggest, clear, copy])]),
+          unlocked() ? null : el("p", { class: "planhint", text: "🔒 Viewing only: changes to the plan and list stay on this device. Unlock editing to share them." }),
+          stats,
+          recipes.length ? week : el("p", { class: "status", text: "Save a few recipes first, then plan the week here." }),
+          shopping
+        );
+        if (focusDay >= 0) {
+          var rows = week.children[focusDay] && week.children[focusDay].querySelectorAll(".mealrow select");
+          if (rows && rows.length) rows[rows.length - 1].focus();
+          focusDay = -1;
+        }
+      }
+      render();
+    }).catch(function (e) { status(loadError(e), true); });
+  }
+
+  // ---------- routing ----------
+  function setTab(name) {
+    ["Recipes", "Week"].forEach(function (t) {
+      var a = document.getElementById("tab" + t);
+      if (t.toLowerCase() === name) a.setAttribute("aria-current", "page"); else a.removeAttribute("aria-current");
+    });
+  }
+  function route() {
+    var hash = location.hash;
+    if (/^#week(=|$)/.test(hash)) { setTab("week"); showWeek(); return; }
+    setTab("recipes");
+    if (hash === "#add") { showEditor(null); return; }
+    var m = /^#edit=([a-z0-9-]+)$/.exec(hash);
+    if (m) { showEditor(m[1]); return; }
+    var slug = decodeURIComponent(hash.replace(/^#\/?/, ""));
+    if (slug && /^[a-z0-9-]+$/.test(slug)) showRecipe(slug); else showList();
+  }
+  window.addEventListener("hashchange", route);
+  renderLock();
+  Promise.all([loadPrices(), loadSharedPlan()]).then(route, route);
+
+  // ---------- save from a link ----------
+  var form = document.getElementById("addForm"), input = document.getElementById("urlInput"), hint = document.getElementById("addHint"), saveBtn = document.getElementById("saveLinkBtn");
+  function setHint(msg, isError, link) {
+    hint.replaceChildren.apply(hint, [msg, link ? " " : null, link ? el("a", { href: link, target: "_blank", rel: "noopener", text: "See the log." }) : null].filter(Boolean));
+    hint.classList.toggle("err", !!isError);
+  }
+  function waitForRun(t0) {
+    var deadline = t0 + 4 * 60 * 1000;
+    return new Promise(function (resolve, reject) {
+      (function tick() {
+        api("GET", "/actions/workflows/save-recipe.yml/runs?event=workflow_dispatch&per_page=5").then(function (res) {
+          var run = (res.workflow_runs || []).filter(function (r) { return new Date(r.created_at).getTime() >= t0 - 30000; })
+            .sort(function (a, b) { return new Date(b.created_at) - new Date(a.created_at); })[0];
+          if (run && run.status === "completed") return resolve(run);
+          if (Date.now() > deadline) return reject(new Error("Still working after a few minutes. Reload in a bit; the recipe may show up then."));
+          setHint(run ? "Reading the recipe… " + Math.round((Date.now() - t0) / 1000) + "s" : "Starting…");
+          setTimeout(tick, 5000);
+        }).catch(reject);
+      })();
+    });
+  }
+  form.addEventListener("submit", function (ev) {
+    ev.preventDefault();
+    var url = input.value.trim();
+    if (!/^https?:\/\/\S+$/i.test(url)) { setHint("That doesn't look like a link — it should start with http:// or https://.", true); return; }
+    var t0 = Date.now();
+    saveBtn.disabled = true; input.disabled = true;
+    setHint("Fetching the recipe in the background… this usually takes 20–40 seconds.");
+    api("POST", "/actions/workflows/save-recipe.yml/dispatches", { ref: BRANCH, inputs: { url: url } })
+      .then(function () { return waitForRun(t0); })
+      .then(function (run) {
+        if (run.conclusion !== "success") {
+          var e = new Error("Couldn't read a recipe from that page. Not every site publishes recipe data, and some block automated fetches."); e.runUrl = run.html_url; throw e;
+        }
+        return loadIndex(true);
+      })
+      .then(function (index) {
+        var norm = function (u) { return String(u || "").replace(/\/+$/, "").toLowerCase(); };
+        var hit = index.filter(function (r) { return norm(r.source) === norm(url); })[0] || sortIndex(index)[0];
+        setHint(hit ? "Saved “" + hit.name + "”." : "Saved.");
+        input.value = "";
+        if (hit) { delete recipeCache[hit.slug]; location.hash = "#" + encodeURIComponent(hit.slug); } else route();
+      })
+      .catch(function (e) { setHint(e.message, true, e.runUrl); })
+      .then(function () { saveBtn.disabled = false; input.disabled = false; });
+  });
+
+  // ---------- theme ----------
+  var root = document.documentElement;
+  var savedTheme = null; try { savedTheme = localStorage.getItem("max-theme"); } catch (e) {}
+  if (savedTheme) root.setAttribute("data-theme", savedTheme);
+  document.getElementById("themeBtn").addEventListener("click", function () {
+    var cur = root.getAttribute("data-theme");
+    var isDark = cur ? cur === "dark" : window.matchMedia("(prefers-color-scheme: dark)").matches;
+    var next = isDark ? "light" : "dark";
+    root.setAttribute("data-theme", next);
+    try { localStorage.setItem("max-theme", next); } catch (e) {}
+  });
+})();
+</script>
+</body>
+</html>
