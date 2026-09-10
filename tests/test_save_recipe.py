@@ -108,6 +108,20 @@ class PlanScrubTests(unittest.TestCase):
         self.assertNotIn(": null", sr.PLAN_FILE.read_text(encoding="utf-8"))
         self.assertEqual(cleaned["extras"][0]["text"], "milk")
 
+    def test_scrub_keeps_other_kind_and_drops_unknown_kinds(self):
+        self._write_recipe("beef-stroganoff")
+        plan = {
+            "days": [
+                [{"kind": "dinner", "slug": ""}, {"kind": "other", "slug": "beef-stroganoff"}, {"kind": "snack", "slug": "beef-stroganoff"}],
+            ] + [[{"kind": "dinner", "slug": ""}] for _ in range(6)],
+            "checked": {}, "extras": [], "updatedAt": "t",
+        }
+        sr.PLAN_FILE.write_text(json.dumps(plan), encoding="utf-8")
+        self.assertTrue(sr.scrub_plan())
+        monday = json.loads(sr.PLAN_FILE.read_text(encoding="utf-8"))["days"][0]
+        self.assertEqual([m["kind"] for m in monday], ["dinner", "other"])
+        self.assertEqual(monday[1]["slug"], "beef-stroganoff")
+
     def test_rebuild_index_scrubs_plan(self):
         self._write_recipe("pasta", "Creamy Pasta")
         sr.PLAN_FILE.write_text(

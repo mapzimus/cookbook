@@ -346,7 +346,7 @@ def scrub_plan(known=None):
                 for meal in day:
                     if not isinstance(meal, dict):
                         continue
-                    kind = meal.get("kind") if meal.get("kind") in {"dinner", "breakfast", "lunch", "dessert"} else None
+                    kind = meal.get("kind") if meal.get("kind") in {"dinner", "breakfast", "lunch", "dessert", "other"} else None
                     if not kind:
                         continue
                     slug = valid_slug(meal.get("slug"))
