@@ -3,7 +3,7 @@
   [
    {
     "kind": "dinner",
-    "slug": "beef-stroganoff"
+    "slug": ""
    }
   ],
   [
@@ -21,7 +21,7 @@
   [
    {
     "kind": "dinner",
-    "slug": "beef-stroganoff"
+    "slug": ""
    }
   ],
   [
@@ -33,7 +33,7 @@
   [
    {
     "kind": "dinner",
-    "slug": "beef-stroganoff"
+    "slug": ""
    }
   ],
   [
@@ -45,5 +45,5 @@
  ],
  "checked": {},
  "extras": [],
- "updatedAt": "2026-09-10T11:26:07Z"
+ "updatedAt": "2026-09-10T23:26:41Z"
 }
