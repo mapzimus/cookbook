@@ -1,0 +1,50 @@
+name: Save recipe
+
+on:
+  workflow_dispatch:
+    inputs:
+      url:
+        description: Recipe URL to save
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
+concurrency:
+  group: cookbook-save
+  cancel-in-progress: false
+
+jobs:
+  save:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - id: save
+        env:
+          RECIPE_URL: ${{ inputs.url }}
+        run: python3 save_recipe.py
+
+      - if: steps.save.outputs.slug != ''
+        env:
+          RECIPE_NAME: ${{ steps.save.outputs.name }}
+          SOURCE_URL: ${{ steps.save.outputs.source }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.json recipes/
+          if git diff --cached --quiet; then
+            echo "Already saved and unchanged."
+          else
+            git commit -m "Cookbook: save \"$RECIPE_NAME\"" -m "Source: $SOURCE_URL"
+            git pull --rebase origin "${GITHUB_REF_NAME}"
+            git push origin HEAD:"${GITHUB_REF_NAME}"
+          fi
+
+      - if: steps.save.outputs.slug == ''
+        env:
+          REASON: ${{ steps.save.outputs.error }}
+        run: |
+          echo "::error::${REASON:-Couldn't fetch or parse the page.}"
+          exit 1
