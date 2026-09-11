@@ -1,6 +1,7 @@
 {
  "slug": "brownies",
  "name": "Brownies",
+ "category": "dessert",
  "source": "https://www.cookingclassy.com/brownie-recipe/",
  "site": "cookingclassy.com",
  "image": "https://www.cookingclassy.com/wp-content/uploads/2019/05/brownies-22.jpg",
@@ -31,5 +32,6 @@
    ]
   }
  ],
- "savedAt": "2026-09-10T23:46:10Z"
+ "savedAt": "2026-09-10T23:46:10Z",
+ "updatedAt": "2026-09-11T09:54:26Z"
 }
