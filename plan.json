@@ -46,8 +46,10 @@
  "checked": {},
  "extras": [],
  "pantry": {
-  "have": [],
+  "have": [
+   "milk"
+  ],
   "need": []
  },
- "updatedAt": "2026-09-11T10:02:27Z"
+ "updatedAt": "2026-09-11T10:06:55Z"
 }
