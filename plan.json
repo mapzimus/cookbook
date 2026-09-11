@@ -49,5 +49,9 @@
   "sour cream": 1
  },
  "extras": [],
- "updatedAt": "2026-09-10T23:47:36Z"
+ "pantry": {
+  "have": [],
+  "need": []
+ },
+ "updatedAt": "2026-09-11T09:54:00Z"
 }
