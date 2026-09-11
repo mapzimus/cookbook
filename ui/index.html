@@ -290,8 +290,14 @@
     });
     return node;
   }
+  // Node.replaceChildren turns a null argument into the text "null", so anything
+  // conditional has to be filtered out before it reaches the DOM.
+  function show() {
+    var kids = [].slice.call(arguments).filter(function (c) { return c != null && c !== false; });
+    view.replaceChildren.apply(view, kids);
+  }
   function status(msg, isError, extra) {
-    view.replaceChildren(el("p", { class: "status" + (isError ? " error" : "") }, [msg, extra ? el("br") : null, extra]));
+    show(el("p", { class: "status" + (isError ? " error" : "") }, [msg, extra ? el("br") : null, extra]));
   }
   function store(key, value) { try { localStorage.setItem(key, JSON.stringify(value)); } catch (e) {} }
   function load(key, fallback) {
@@ -1083,7 +1089,7 @@
       });
       search.addEventListener("input", function () { listQuery = search.value; draw(); });
       draw();
-      view.replaceChildren(el("div", { class: "searchbar" }, [search, count]), filters, grid);
+      show(el("div", { class: "searchbar" }, [search, count]), filters, grid);
     }).catch(function (e) { status(loadError(e), true); });
   }
 
@@ -1137,7 +1143,7 @@
         actions = el("div", { class: "actions" }, [el("a", { class: "btn", href: "#edit=" + encodeURIComponent(r.slug), text: "✎ Edit" }), del]);
       }
 
-      view.replaceChildren(el("article", { class: "recipe" }, [
+      show(el("article", { class: "recipe" }, [
         el("div", { class: "topline" }, [el("a", { class: "backlink", href: "#", text: "← All recipes" }), actions]),
         el("h2", { text: r.name || slug }),
         meta,
@@ -1259,7 +1265,7 @@
           err.textContent = "Couldn't save (" + e.message + "). Your text is still here; try again."; err.hidden = false;
         });
       });
-      view.replaceChildren(form);
+      show(form);
       window.scrollTo(0, 0);
       if (!existing) form.elements.name.focus();
     }).catch(function (e) { status(loadError(e), true); });
@@ -1501,7 +1507,7 @@
           );
         });
 
-        view.replaceChildren(
+        show(
           el("div", { class: "weekhead" }, [el("h2", { text: "Meals this week" }), el("div", { class: "actions" }, [suggest, clear, copy])]),
           unlocked() ? null : el("p", { class: "planhint", text: "🔒 Viewing only: changes to the plan and list stay on this device. Unlock editing to share them." }),
           stats,
@@ -1656,7 +1662,7 @@
           holder.replaceWith(frag);
         });
 
-        view.replaceChildren(
+        show(
           el("div", { class: "weekhead" }, [el("h2", { text: "Shopping list" }), el("div", { class: "actions" }, [el("a", { class: "btn", href: "#week", text: "← This week" })])]),
           unlocked() ? null : el("p", { class: "planhint", text: "🔒 Viewing only: what you check off stays on this device. Unlock editing to share it." }),
           shopping
@@ -1724,7 +1730,7 @@
       });
       wrap.appendChild(stapleChips);
 
-      view.replaceChildren(
+      show(
         el("div", { class: "weekhead" }, [el("h2", { text: "Pantry" }), el("div", { class: "actions" }, [el("a", { class: "btn", href: "#shopping", text: "🛒 Shopping list →" })])]),
         unlocked() ? null : el("p", { class: "planhint", text: "🔒 Viewing only: pantry changes stay on this device. Unlock editing to share them." }),
         wrap
