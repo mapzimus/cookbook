@@ -56,7 +56,6 @@
    "coconut oil",
    "cooking spray",
    "cornstarch",
-   "curry powder",
    "garlic powder",
    "granulated sugar",
    "honey",
@@ -72,9 +71,10 @@
    "sprinkles",
    "vanilla",
    "vegetable oil",
-   "water"
+   "water",
+   "milk"
   ],
   "need": []
  },
- "updatedAt": "2026-09-11T23:29:49Z"
+ "updatedAt": "2026-09-11T23:30:03Z"
 }
