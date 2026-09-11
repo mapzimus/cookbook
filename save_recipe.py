@@ -23,9 +23,37 @@ ROOT = Path(os.environ.get("COOKBOOK_DIR") or Path(__file__).resolve().parent)
 RECIPES_DIR = ROOT / "recipes"
 INDEX_FILE = ROOT / "index.json"
 PLAN_FILE = ROOT / "plan.json"
-INDEX_FIELDS = ("slug", "name", "site", "source", "image", "prepTime", "cookTime", "totalTime", "savedAt")
+INDEX_FIELDS = ("slug", "name", "category", "site", "source", "image", "prepTime", "cookTime", "totalTime", "savedAt")
 SLUG_RE = re.compile(r"^[a-z0-9-]+$")
 RESERVED_SLUGS = frozenset({"null", "undefined", "none"})
+# What a recipe is. The planner only randomises dinners out of "meal", so a
+# cheesecake or a cocktail never lands on a Tuesday night.
+CATEGORIES = ("meal", "breakfast", "appetizer", "dessert", "drink")
+MEAL_KINDS = frozenset({"dinner", "breakfast", "lunch", "dessert", "other"})
+# Matched against the page's own recipeCategory / keywords, longest first.
+CATEGORY_HINTS = (
+    ("drink", ("cocktail", "drink", "beverage", "mocktail", "smoothie", "punch")),
+    ("dessert", ("dessert", "cake", "cookie", "pie", "brownie", "cheesecake", "ice cream", "pudding", "candy", "sweet", "frosting", "tart")),
+    ("appetizer", ("appetizer", "appetiser", "starter", "snack", "hors d", "dip", "side dish", "side")),
+    ("breakfast", ("breakfast", "brunch", "pancake", "waffle", "granola", "oatmeal")),
+    ("meal", ("main", "dinner", "lunch", "entree", "entrée", "supper")),
+)
+
+
+def category_of(recipe):
+    """Guess one of CATEGORIES from the page's structured recipe data."""
+    parts = []
+    for key in ("recipeCategory", "keywords", "recipeCuisine"):
+        value = recipe.get(key)
+        if isinstance(value, str):
+            parts.append(value)
+        elif isinstance(value, list):
+            parts.extend(str(v) for v in value if isinstance(v, (str, int, float)))
+    hay = " ".join(parts).lower()
+    for category, words in CATEGORY_HINTS:
+        if any(word in hay for word in words):
+            return category
+    return "meal"
 
 # Look like a normal browser; several sites refuse the default Python agent.
 HEADERS = {
@@ -286,6 +314,7 @@ def normalize(recipe, source):
     data = {
         "slug": unique_slug(slugify(name), source),
         "name": name,
+        "category": category_of(recipe),
         "source": source,
         "site": re.sub(r"^www\.", "", host) or None,
         "author": ", ".join(n for n in person_names(recipe.get("author")) if n) or None,
@@ -346,7 +375,7 @@ def scrub_plan(known=None):
                 for meal in day:
                     if not isinstance(meal, dict):
                         continue
-                    kind = meal.get("kind") if meal.get("kind") in {"dinner", "breakfast", "lunch", "dessert", "other"} else None
+                    kind = meal.get("kind") if meal.get("kind") in MEAL_KINDS else None
                     if not kind:
                         continue
                     slug = valid_slug(meal.get("slug"))
@@ -363,11 +392,22 @@ def scrub_plan(known=None):
     checked = {str(k): 1 for k, v in checked_in.items() if v}
     extras_in = doc.get("extras") if isinstance(doc.get("extras"), list) else []
     extras = [x for x in extras_in if isinstance(x, dict) and x.get("id") and isinstance(x.get("text"), str) and x["text"].strip()]
+    pantry_in = doc.get("pantry") if isinstance(doc.get("pantry"), dict) else {}
+
+    def pantry_list(value):
+        if not isinstance(value, list):
+            return []
+        out = []
+        for item in value:
+            if isinstance(item, str) and item.strip() and item.strip().lower() not in out:
+                out.append(item.strip().lower())
+        return out[:200]
 
     cleaned = {
         "days": days,
         "checked": checked,
         "extras": extras,
+        "pantry": {"have": pantry_list(pantry_in.get("have")), "need": pantry_list(pantry_in.get("need"))},
         "updatedAt": doc.get("updatedAt")
         if isinstance(doc.get("updatedAt"), str) and doc.get("updatedAt")
         else datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),

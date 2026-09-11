@@ -122,6 +122,35 @@ class PlanScrubTests(unittest.TestCase):
         self.assertEqual([m["kind"] for m in monday], ["dinner", "other"])
         self.assertEqual(monday[1]["slug"], "beef-stroganoff")
 
+    def test_category_is_guessed_from_the_page(self):
+        self.assertEqual(sr.category_of({"recipeCategory": "Dessert"}), "dessert")
+        self.assertEqual(sr.category_of({"keywords": ["oreo cheesecake", "no bake"]}), "dessert")
+        self.assertEqual(sr.category_of({"recipeCategory": "Cocktail"}), "drink")
+        self.assertEqual(sr.category_of({"recipeCategory": "Main Course"}), "meal")
+        self.assertEqual(sr.category_of({}), "meal")
+
+    def test_scrub_keeps_the_pantry(self):
+        self._write_recipe("beef-stroganoff")
+        plan = {
+            "days": [[{"kind": "dinner", "slug": ""}] for _ in range(7)],
+            "checked": {}, "extras": [],
+            "pantry": {"have": ["Soy Sauce", "soy sauce", "  rice  ", ""], "need": ["olive oil"]},
+            "updatedAt": "t",
+        }
+        sr.PLAN_FILE.write_text(json.dumps(plan), encoding="utf-8")
+        sr.scrub_plan()
+        pantry = json.loads(sr.PLAN_FILE.read_text(encoding="utf-8"))["pantry"]
+        self.assertEqual(pantry["have"], ["soy sauce", "rice"])
+        self.assertEqual(pantry["need"], ["olive oil"])
+
+    def test_index_carries_the_category(self):
+        self._write_recipe("pasta", "Creamy Pasta")
+        data = json.loads((sr.RECIPES_DIR / "pasta.json").read_text(encoding="utf-8"))
+        data["category"] = "dessert"
+        (sr.RECIPES_DIR / "pasta.json").write_text(sr.dump_json(data), encoding="utf-8")
+        sr.rebuild_index()
+        self.assertEqual(json.loads(sr.INDEX_FILE.read_text(encoding="utf-8"))[0]["category"], "dessert")
+
     def test_rebuild_index_scrubs_plan(self):
         self._write_recipe("pasta", "Creamy Pasta")
         sr.PLAN_FILE.write_text(
