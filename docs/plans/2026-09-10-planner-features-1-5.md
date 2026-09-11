@@ -1,5 +1,9 @@
 # Plan: Cookbook planner features 1–5
 
+> **Out of date on one point:** the UI no longer lives here. `ui/index.html` was removed;
+> the only copy of the page is `cookbook/index.html` in `mapzimus/maxwellhowegis`. Read every
+> `ui/index.html` below as that file. Features 1–3 have since shipped.
+
 **Goal:** Implement five planner upgrades on the cookbook stack (data in `mapzimus/cookbook`, UI in `ui/index.html` → deploy to `maxwellhowegis/cookbook/index.html`).
 
 **Out of scope for this plan:** private/encrypted plan storage (#6 from the earlier list).

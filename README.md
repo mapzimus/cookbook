@@ -3,6 +3,8 @@
 JSON recipes, the shared weekly plan, and the GitHub Action that saves a recipe from a URL.
 
 The page at [maxwellhowegis.com/cookbook/](https://maxwellhowegis.com/cookbook/) reads and writes this repo.
+The page itself lives in [`mapzimus/maxwellhowegis`](https://github.com/mapzimus/maxwellhowegis) at `cookbook/index.html` — that
+is the only copy. Edit it there; there is nothing here to keep in sync with it.
 
 ## Layout
 
@@ -13,7 +15,6 @@ The page at [maxwellhowegis.com/cookbook/](https://maxwellhowegis.com/cookbook/)
 | `plan.json` | Shared week + shopping checkoffs + extras |
 | `prices.json` | Optional price overrides |
 | `save_recipe.py` | Fetch schema.org Recipe JSON-LD and rebuild the index |
-| `ui/index.html` | Hardened copy of the front-end (deploy to the site repo) |
 
 ## Weekly plan
 
@@ -27,6 +28,7 @@ Each day is a list of meals. Dinner is always first. **Empty slots use `""`, nev
   ],
   "checked": {},
   "extras": [],
+  "pantry": { "have": [], "need": [] },
   "updatedAt": "2026-09-10T00:00:00Z"
 }
 ```
@@ -47,10 +49,8 @@ Tests:
 python3 -m unittest tests.test_save_recipe -v
 ```
 
-## Front-end deploy note
+Recipes carry a `category` (`meal`, `breakfast`, `appetizer`, `dessert`, `drink`), guessed on save from the
+page's own `recipeCategory` and keywords. The planner only randomises dinners out of `meal`.
 
-The live UI still lives in `mapzimus/maxwellhowegis` at `cookbook/index.html`. This repo’s `ui/index.html` is the hardened version (empty slots as `""`, no `null` stringification, scrub plan on recipe delete). Copy it over when you next update the site:
-
-```bash
-cp ui/index.html ../maxwellhowegis/cookbook/index.html
-```
+`pantry.have` is what the household always keeps in (never priced); `pantry.need` is the built-in staples it
+does not keep in (priced as normal).
