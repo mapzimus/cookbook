@@ -47,7 +47,9 @@
  "extras": [],
  "pantry": {
   "have": [],
-  "need": []
+  "need": [
+   "water"
+  ]
  },
- "updatedAt": "2026-09-11T10:44:46Z"
+ "updatedAt": "2026-09-11T10:44:58Z"
 }
