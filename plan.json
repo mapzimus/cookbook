@@ -43,15 +43,11 @@
    }
   ]
  ],
- "checked": {
-  "butter": 1,
-  "cream cheese": 1,
-  "sour cream": 1
- },
+ "checked": {},
  "extras": [],
  "pantry": {
   "have": [],
   "need": []
  },
- "updatedAt": "2026-09-11T09:55:05Z"
+ "updatedAt": "2026-09-11T10:02:27Z"
 }
