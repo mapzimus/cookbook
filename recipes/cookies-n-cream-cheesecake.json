@@ -1,6 +1,7 @@
 {
  "slug": "cookies-n-cream-cheesecake",
  "name": "Cookies ‘N Cream Cheesecake",
+ "category": "dessert",
  "source": "https://www.cookingclassy.com/cookies-n-cream-cheesecake/",
  "site": "cookingclassy.com",
  "image": "https://www.cookingclassy.com/wp-content/uploads/2016/12/oreo-cheesecake-4.jpg",
@@ -38,5 +39,6 @@
    ]
   }
  ],
- "savedAt": "2026-09-10T23:27:16Z"
+ "savedAt": "2026-09-10T23:27:16Z",
+ "updatedAt": "2026-09-11T09:54:47Z"
 }
