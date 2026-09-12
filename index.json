@@ -1,5 +1,17 @@
 [
  {
+  "slug": "french-onion-chicken",
+  "name": "French Onion Chicken",
+  "category": "meal",
+  "site": "cookingclassy.com",
+  "source": "https://www.cookingclassy.com/french-onion-chicken/",
+  "image": "https://www.cookingclassy.com/wp-content/uploads/2025/09/french-onion-chicken-01.jpg",
+  "prepTime": "20 min",
+  "cookTime": "1 hr",
+  "totalTime": "1 hr 20 min",
+  "savedAt": "2026-09-12T17:09:54Z"
+ },
+ {
   "slug": "ravioli-lasagna",
   "name": "Ravioli Lasagna",
   "category": "meal",
