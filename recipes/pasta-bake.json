@@ -1,0 +1,18 @@
+{
+ "slug": "pasta-bake",
+ "name": "Pasta Bake",
+ "category": "meal",
+ "yield": "6",
+ "prepTime": "5 min",
+ "cookTime": "30 min",
+ "totalTime": "35 min",
+ "ingredients": [
+  "1/2 box rotini",
+  "1lb ground beef",
+  "Shredded mozzerella cheese",
+  "1 jar Raos",
+  "1/2 block cream cheese"
+ ],
+ "instructions": [],
+ "savedAt": "2026-09-12T17:07:01Z"
+}

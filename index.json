@@ -1,5 +1,14 @@
 [
  {
+  "slug": "pasta-bake",
+  "name": "Pasta Bake",
+  "category": "meal",
+  "prepTime": "5 min",
+  "cookTime": "30 min",
+  "totalTime": "35 min",
+  "savedAt": "2026-09-12T17:07:01Z"
+ },
+ {
   "slug": "slow-cooker-sweet-pork-barbacoa",
   "name": "Slow Cooker Sweet Pork Barbacoa",
   "category": "dessert",
