@@ -1,5 +1,17 @@
 [
  {
+  "slug": "barbacoa-beef",
+  "name": "Barbacoa Beef",
+  "category": "meal",
+  "site": "cookingclassy.com",
+  "source": "https://www.cookingclassy.com/barbacoa/",
+  "image": "https://www.cookingclassy.com/wp-content/uploads/2019/04/Slow-Cooker-Barbacoa-Beef-10.jpg",
+  "prepTime": "20 min",
+  "cookTime": "8 hr",
+  "totalTime": "8 hr 20 min",
+  "savedAt": "2026-09-12T17:04:53Z"
+ },
+ {
   "slug": "brownies",
   "name": "Brownies",
   "category": "dessert",

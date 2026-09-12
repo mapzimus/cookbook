@@ -1,0 +1,41 @@
+{
+ "slug": "barbacoa-beef",
+ "name": "Barbacoa Beef",
+ "category": "meal",
+ "source": "https://www.cookingclassy.com/barbacoa/",
+ "site": "cookingclassy.com",
+ "image": "https://www.cookingclassy.com/wp-content/uploads/2019/04/Slow-Cooker-Barbacoa-Beef-10.jpg",
+ "description": "The best Barbacoa Beef recipe! This flavorful meat is deliciously seasoned and cooked low and slow until perfectly tender. Layer it in tortillas with all your favorite toppings for a crave-worthy dinner!",
+ "yield": "8",
+ "prepTime": "20 min",
+ "cookTime": "8 hr",
+ "totalTime": "8 hr 20 min",
+ "ingredients": [
+  "3 lb chuck roast",
+  "Salt and freshly ground black pepper",
+  "2 Tbsp vegetable oil",
+  "1 1/4 cups beef broth, (divided)",
+  "3 - 4 chipotle chilies in adobo*",
+  "6 garlic cloves",
+  "1 1/2 Tbsp ground cumin",
+  "1 Tbsp dried oregano",
+  "1/4 tsp ground cloves",
+  "3 bay leaves",
+  "1/4 cup fresh lime juice"
+ ],
+ "instructions": [
+  {
+   "steps": [
+    "Cut roast into 6 portions while removing any large pieces of fat. Heat 1 Tbsp vegetable oil in a skillet.",
+    "Dab roast dry with paper towels, season with salt and pepper (about 1 tsp salt 3/4 tsp pepper). Add 3 pieces to skillet and sear until browned on all sides. Transfer to a slow cooker.",
+    "Add remaining 1 Tbsp vegetable oil to skillet and repeat process with remaining 3 roast pieces. Nestle beef portions side by side in an even layer in slow cooker.",
+    "In a food processor, pulse together chipotle chilies, garlic and 1/4 cup beef broth until well pureed, occasionally stopping and scraping down sides of processor.",
+    "In a 2 cup liquid measuring cup or in a bowl, whisk together remaining beef broth with chipotle mixture, cumin, oregano and cloves. Pour mixture over beef in slow cooker, then nestle bay leaves between beef portions.",
+    "Cover and cook on low heat 8 - 9 hours**.",
+    "Remove beef from slow cooker (leave broth) and shred. Stir lime juice into broth in slow cooker then return beef to slow cooker and cook on low or warm 20 - 30 minutes longer.",
+    "Strain liquid from beef and serve in tortillas with desired toppings."
+   ]
+  }
+ ],
+ "savedAt": "2026-09-12T17:04:53Z"
+}
