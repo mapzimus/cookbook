@@ -9,37 +9,37 @@
   [
    {
     "kind": "dinner",
-    "slug": ""
+    "slug": "chicken-pesto-sandwich"
    }
   ],
   [
    {
     "kind": "dinner",
-    "slug": ""
+    "slug": "cheesy-chicken-broccoli-orzo"
    }
   ],
   [
    {
     "kind": "dinner",
-    "slug": ""
+    "slug": "slow-cooker-sweet-pork-barbacoa"
    }
   ],
   [
    {
     "kind": "dinner",
-    "slug": ""
+    "slug": "french-onion-chicken"
    }
   ],
   [
    {
     "kind": "dinner",
-    "slug": ""
+    "slug": "barbacoa-beef"
    }
   ],
   [
    {
     "kind": "dinner",
-    "slug": ""
+    "slug": "ravioli-lasagna"
    }
   ]
  ],
@@ -79,5 +79,5 @@
   ],
   "need": []
  },
- "updatedAt": "2026-09-12T17:08:33Z"
+ "updatedAt": "2026-09-12T17:11:42Z"
 }
