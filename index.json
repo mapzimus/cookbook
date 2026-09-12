@@ -1,5 +1,17 @@
 [
  {
+  "slug": "chicken-pesto-sandwich",
+  "name": "Chicken Pesto Sandwich",
+  "category": "meal",
+  "site": "cookingclassy.com",
+  "source": "https://www.cookingclassy.com/chicken-pesto-sandwich/",
+  "image": "https://www.cookingclassy.com/wp-content/uploads/2026/07/chicken-pesto-sandwich-2.jpg",
+  "prepTime": "20 min",
+  "cookTime": "12 min",
+  "totalTime": "1 hr 2 min",
+  "savedAt": "2026-09-12T17:07:29Z"
+ },
+ {
   "slug": "pasta-bake",
   "name": "Pasta Bake",
   "category": "meal",
