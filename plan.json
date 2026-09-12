@@ -3,7 +3,7 @@
   [
    {
     "kind": "dinner",
-    "slug": ""
+    "slug": "pasta-bake"
    }
   ],
   [
@@ -79,5 +79,5 @@
   ],
   "need": []
  },
- "updatedAt": "2026-09-12T17:08:26Z"
+ "updatedAt": "2026-09-12T17:08:33Z"
 }
