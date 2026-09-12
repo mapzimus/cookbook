@@ -1,7 +1,7 @@
 {
  "slug": "slow-cooker-sweet-pork-barbacoa",
  "name": "Slow Cooker Sweet Pork Barbacoa",
- "category": "dessert",
+ "category": "meal",
  "source": "https://www.cookingclassy.com/slow-cooker-sweet-pork-barbacoa/",
  "site": "cookingclassy.com",
  "image": "https://www.cookingclassy.com/wp-content/uploads/2013/01/sweet-pork-tacos.jpg",
@@ -32,5 +32,6 @@
    ]
   }
  ],
- "savedAt": "2026-09-12T17:06:40Z"
+ "savedAt": "2026-09-12T17:06:40Z",
+ "updatedAt": "2026-09-12T17:11:16Z"
 }
