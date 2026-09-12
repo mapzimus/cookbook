@@ -1,5 +1,17 @@
 [
  {
+  "slug": "turkey-chili",
+  "name": "Turkey Chili",
+  "category": "meal",
+  "site": "cookingclassy.com",
+  "source": "https://www.cookingclassy.com/turkey-chili/",
+  "image": "https://www.cookingclassy.com/wp-content/uploads/2021/02/turkey-chili-33.jpg",
+  "prepTime": "10 min",
+  "cookTime": "50 min",
+  "totalTime": "1 hr",
+  "savedAt": "2026-09-12T17:13:22Z"
+ },
+ {
   "slug": "french-onion-chicken",
   "name": "French Onion Chicken",
   "category": "meal",
