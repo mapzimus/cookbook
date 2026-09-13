@@ -1,5 +1,17 @@
 [
  {
+  "slug": "banana-bread",
+  "name": "Banana Bread",
+  "category": "dessert",
+  "site": "cookingclassy.com",
+  "source": "https://www.cookingclassy.com/banana-bread-the-perfect-loaf/",
+  "image": "https://www.cookingclassy.com/wp-content/uploads/2012/04/banana-bread-3.jpg",
+  "prepTime": "10 min",
+  "cookTime": "1 hr",
+  "totalTime": "1 hr 10 min",
+  "savedAt": "2026-09-13T15:38:28Z"
+ },
+ {
   "slug": "pot-roast-with-potatoes-and-carrots",
   "name": "Pot Roast with Potatoes and Carrots",
   "category": "meal",
