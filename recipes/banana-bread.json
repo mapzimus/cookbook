@@ -1,7 +1,7 @@
 {
  "slug": "banana-bread",
  "name": "Banana Bread",
- "category": "dessert",
+ "category": "breakfast",
  "source": "https://www.cookingclassy.com/banana-bread-the-perfect-loaf/",
  "site": "cookingclassy.com",
  "author": "Jaclyn",
@@ -37,5 +37,6 @@
    ]
   }
  ],
- "savedAt": "2026-09-13T15:38:28Z"
+ "savedAt": "2026-09-13T15:38:28Z",
+ "updatedAt": "2026-09-13T15:38:46Z"
 }
