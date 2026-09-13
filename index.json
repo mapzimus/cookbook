@@ -1,5 +1,17 @@
 [
  {
+  "slug": "best-cornbread-recipe",
+  "name": "Best Cornbread Recipe",
+  "category": "meal",
+  "site": "cookingclassy.com",
+  "source": "https://www.cookingclassy.com/best-cornbread/",
+  "image": "https://www.cookingclassy.com/wp-content/uploads/2019/10/cornbread-14.jpg",
+  "prepTime": "15 min",
+  "cookTime": "25 min",
+  "totalTime": "1 hr 10 min",
+  "savedAt": "2026-09-13T16:34:39Z"
+ },
+ {
   "slug": "banana-bread",
   "name": "Banana Bread",
   "category": "breakfast",
