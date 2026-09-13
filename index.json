@@ -1,5 +1,17 @@
 [
  {
+  "slug": "pot-roast-with-potatoes-and-carrots",
+  "name": "Pot Roast with Potatoes and Carrots",
+  "category": "meal",
+  "site": "cookingclassy.com",
+  "source": "https://www.cookingclassy.com/pot-roast-with-potatoes-and-carrots/",
+  "image": "https://www.cookingclassy.com/wp-content/uploads/2015/09/pot-roast-with-potatoes-and-carrots5-srgb..jpg",
+  "prepTime": "15 min",
+  "cookTime": "3 hr 30 min",
+  "totalTime": "3 hr 45 min",
+  "savedAt": "2026-09-13T01:30:14Z"
+ },
+ {
   "slug": "turkey-chili",
   "name": "Turkey Chili",
   "category": "meal",
