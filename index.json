@@ -1,5 +1,17 @@
 [
  {
+  "slug": "lasagna",
+  "name": "Lasagna",
+  "category": "meal",
+  "site": "cookingclassy.com",
+  "source": "https://www.cookingclassy.com/lasagna/",
+  "image": "https://www.cookingclassy.com/wp-content/uploads/2013/03/lasagna15.jpg",
+  "prepTime": "35 min",
+  "cookTime": "1 hr 50 min",
+  "totalTime": "2 hr 25 min",
+  "savedAt": "2026-09-25T19:32:18Z"
+ },
+ {
   "slug": "best-cornbread-recipe",
   "name": "Best Cornbread Recipe",
   "category": "meal",
