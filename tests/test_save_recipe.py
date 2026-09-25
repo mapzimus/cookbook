@@ -126,6 +126,10 @@ class PlanScrubTests(unittest.TestCase):
         self.assertEqual(sr.category_of({"recipeCategory": "Dessert"}), "dessert")
         self.assertEqual(sr.category_of({"keywords": ["oreo cheesecake", "no bake"]}), "dessert")
         self.assertEqual(sr.category_of({"recipeCategory": "Cocktail"}), "drink")
+        self.assertEqual(sr.category_of({"recipeCategory": "Side Dish"}), "side")
+        self.assertEqual(sr.category_of({"keywords": ["easy sides", "thanksgiving"]}), "side")
+        self.assertEqual(sr.category_of({"recipeCategory": "Appetizer"}), "appetizer")
+        self.assertIn("side", sr.CATEGORIES)
         self.assertEqual(sr.category_of({"recipeCategory": "Main Course"}), "meal")
         self.assertEqual(sr.category_of({}), "meal")
 

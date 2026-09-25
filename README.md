@@ -49,7 +49,7 @@ Tests:
 python3 -m unittest tests.test_save_recipe -v
 ```
 
-Recipes carry a `category` (`meal`, `breakfast`, `appetizer`, `dessert`, `drink`), guessed on save from the
+Recipes carry a `category` (`meal`, `breakfast`, `appetizer`, `side`, `dessert`, `drink`), guessed on save from the
 page's own `recipeCategory` and keywords. The planner only randomises dinners out of `meal`.
 
 `pantry.have` is what the household always keeps in (never priced); `pantry.need` is the built-in staples it
