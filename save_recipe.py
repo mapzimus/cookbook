@@ -28,13 +28,14 @@ SLUG_RE = re.compile(r"^[a-z0-9-]+$")
 RESERVED_SLUGS = frozenset({"null", "undefined", "none"})
 # What a recipe is. The planner only randomises dinners out of "meal", so a
 # cheesecake or a cocktail never lands on a Tuesday night.
-CATEGORIES = ("meal", "breakfast", "appetizer", "dessert", "drink")
+CATEGORIES = ("meal", "breakfast", "appetizer", "side", "dessert", "drink")
 MEAL_KINDS = frozenset({"dinner", "breakfast", "lunch", "dessert", "other"})
 # Matched against the page's own recipeCategory / keywords, longest first.
 CATEGORY_HINTS = (
     ("drink", ("cocktail", "drink", "beverage", "mocktail", "smoothie", "punch")),
     ("dessert", ("dessert", "cake", "cookie", "pie", "brownie", "cheesecake", "ice cream", "pudding", "candy", "sweet", "frosting", "tart")),
-    ("appetizer", ("appetizer", "appetiser", "starter", "snack", "hors d", "dip", "side dish", "side")),
+    ("side", ("side dish", "side")),
+    ("appetizer", ("appetizer", "appetiser", "starter", "snack", "hors d", "dip")),
     ("breakfast", ("breakfast", "brunch", "pancake", "waffle", "granola", "oatmeal")),
     ("meal", ("main", "dinner", "lunch", "entree", "entrée", "supper")),
 )
