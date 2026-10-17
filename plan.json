@@ -3,43 +3,43 @@
   [
    {
     "kind": "dinner",
-    "slug": ""
+    "slug": "barbacoa-beef"
    }
   ],
   [
    {
     "kind": "dinner",
-    "slug": ""
+    "slug": "turkey-chili"
    }
   ],
   [
    {
     "kind": "dinner",
-    "slug": ""
+    "slug": "lasagna"
    }
   ],
   [
    {
     "kind": "dinner",
-    "slug": ""
+    "slug": "pot-roast-with-potatoes-and-carrots"
    }
   ],
   [
    {
     "kind": "dinner",
-    "slug": ""
+    "slug": "best-cornbread-recipe"
    }
   ],
   [
    {
     "kind": "dinner",
-    "slug": ""
+    "slug": "chicken-pesto-sandwich"
    }
   ],
   [
    {
     "kind": "dinner",
-    "slug": ""
+    "slug": "french-onion-chicken"
    }
   ]
  ],
@@ -79,5 +79,5 @@
   ],
   "need": []
  },
- "updatedAt": "2026-10-07T18:42:49Z"
+ "updatedAt": "2026-10-17T06:05:24Z"
 }
