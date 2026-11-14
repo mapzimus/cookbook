@@ -3,43 +3,43 @@
   [
    {
     "kind": "dinner",
-    "slug": "barbacoa-beef"
+    "slug": ""
    }
   ],
   [
    {
     "kind": "dinner",
-    "slug": "turkey-chili"
+    "slug": ""
    }
   ],
   [
    {
     "kind": "dinner",
-    "slug": "lasagna"
+    "slug": ""
    }
   ],
   [
    {
     "kind": "dinner",
-    "slug": "pot-roast-with-potatoes-and-carrots"
+    "slug": ""
    }
   ],
   [
    {
     "kind": "dinner",
-    "slug": "pasta-bake"
+    "slug": ""
    }
   ],
   [
    {
     "kind": "dinner",
-    "slug": "ravioli-lasagna"
+    "slug": ""
    }
   ],
   [
    {
     "kind": "dinner",
-    "slug": "french-onion-chicken"
+    "slug": ""
    }
   ]
  ],
@@ -79,5 +79,5 @@
   ],
   "need": []
  },
- "updatedAt": "2026-11-14T06:44:43Z"
+ "updatedAt": "2026-11-14T06:45:02Z"
 }
