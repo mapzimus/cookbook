@@ -4,6 +4,10 @@
    {
     "kind": "dinner",
     "slug": ""
+   },
+   {
+    "kind": "breakfast",
+    "slug": ""
    }
   ],
   [
@@ -79,5 +83,5 @@
   ],
   "need": []
  },
- "updatedAt": "2026-11-14T06:45:02Z"
+ "updatedAt": "2026-11-14T06:45:32Z"
 }
